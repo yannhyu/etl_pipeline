@@ -1,0 +1,14 @@
+(py2eBureau) C:\Users\yann.yu\Documents\tips\how2python\how2etl_pipeline\etl>
+
+
+
+
+type .\input_data\before\071417_075003_000152_insacct_wins.txt | python .\input_data\step_01_read_inputfile_scramble_152.py > .\input_data\071417_075003_000152_insacct_wins_clean.txt
+
+
+type .\input_data\before\081017_090400_000076_insacct_wins.txt | python .\input_data\step_01_read_inputfile_scramble_76.py > .\input_data\081017_090400_000076_insacct_wins_clean.txt
+
+
+type .\input_data\before\081517_000000_000042_insacct_wins.txt | python .\input_data\step_00_read_inputfile_42.py > .\input_data\081517_000000_000042_insacct_wins_clean.txt
+
+

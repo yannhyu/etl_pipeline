@@ -35,6 +35,10 @@ step three:
 
 run extractor from DEV:
 
+++++++++++++++++++++++++++++++++++++++++
+
+type .\input_data\081017_090400_000076_insacct_wins_clean.txt | python bin\extractor.py 081017_090400_000076
+
 +++++++++++++++++++++++++++++++++++++++++++++++
 cat ../input_data/081017_090400_000076_insacct.txt | sed -e 's/|$//g' | python ./bin/insurance0/read_76_kings_daughter_insurance0.py | python ./bin/insurance0/extractor.py 081017_090400_000076
 +++++++++++++++++++++++++++++++++++++++++++++++

@@ -50,6 +50,7 @@ def db_ready_data_lines(versioned_headers):
         line_cleaned = ''.join(s for s in line if s in string.printable)
         items = line_cleaned.strip().split('|')
         items_with_none = [i or None for i in items]    # Experimental
+        items_with_none = [i.strip() if i else i for i in items_with_none]
         data_line = dict(zip(versioned_headers, items_with_none))
         acctnum = data_line.get('acctnum')
         hid = data_line.get('hid')

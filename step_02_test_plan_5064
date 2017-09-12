@@ -72,6 +72,8 @@ step four:
 
 run transformer
 
+python bin/transformer.py
+
 +++++++++++++++++++++++++++++++++++++++++++++++++
 
 SELECT 
