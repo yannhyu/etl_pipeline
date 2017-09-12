@@ -36,6 +36,18 @@ step three:
 run extractor:
 
 +++++++++++++++++++++++++++++++++++++++++++++++
+
+type .\input_data\042617_190042_005064_insacct_wins.txt | python bin\extractor.py 042617_190042_005064
+
+(py2eBureau) C:\Users\yann.yu\Documents\tips\how2python\how2etl_pipeline\etl>type .\input_data\042617_190042_005064_insacct_wins.txt | python bin\extractor.py 042617_190042_005064
+
+(py2eBureau) C:\Users\yann.yu\Documents\tips\how2python\how2etl_pipeline\etl>
+
+
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
 cat ../input_data/042617_190042_005064_insacct.txt | ./bin/insurance0/read_5064_limamemorial_insurance0.pl | ./bin/insurance0/extractor.py 042617_190042_005064
 
 

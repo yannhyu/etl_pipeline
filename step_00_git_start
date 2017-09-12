@@ -7,4 +7,9 @@ git push -u origin master
 
 
 ++++++++++++++++++++++++++++++++++++++++++++++++++
+power shell + workon
++++++++++++++++++++++++++
+Run workon.bat in without exiting from the CMD child process:
+
+& cmd /k workon <envname>
 
