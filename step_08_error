@@ -1,0 +1,9 @@
+
+
+
+++++++++++++++++++++++++++++
+
+(py2eBureau) yann.yu@mllxv-yu:etl$ cat ../input_data/081917_000000_005005_insacct.txt | ./bin/insurance0/read_5005_iasis_insurance0.pl | python ./bin/insurance0/extractor.py 081917_000000_005005
+Can't locate MLUtils/Logger.pm in @INC (you may need to install the MLUtils::Logger module) (@INC contains: /mnt/lib/perl /opt/medlytix/payorintel/lib/perl /etc/perl /usr/local/lib/x86_64-linux-gnu/perl/5.22.1 /usr/local/share/perl/5.22.1 /usr/lib/x86_64-linux-gnu/perl5/5.22 /usr/share/perl5 /usr/lib/x86_64-linux-gnu/perl/5.22 /usr/share/perl/5.22 /usr/local/lib/site_perl /usr/lib/x86_64-linux-gnu/perl-base .) at ./bin/insurance0/read_5005_iasis_insurance0.pl line 9.
+BEGIN failed--compilation aborted at ./bin/insurance0/read_5005_iasis_insurance0.pl line 9.
+(py2eBureau) yann.yu@mllxv-yu:etl$ 

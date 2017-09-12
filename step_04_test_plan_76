@@ -1,0 +1,131 @@
+step one:
+
+TRUNCATE TABLE payorintel.unstaged_t;
+TRUNCATE TABLE payorintel.temp_batch_insurance0_unstaged_t;
++++++++++++++++++++++++++++++++++++++++++++++++
+
+step two:
+
+get customers incoming file samples from DAPS (chmod 754 ...)
+
+archive the sample files to 
+Z:\dev\pyconversion
+/mnt/shared/dev/pyconversion
++++++++++++++++++++++++++++++++++++++++++++++++
+-rwxrwxrwx 1 22406 65533  12K Aug 22 16:07 042617_190042_005064_insacct.txt
+-rwxrwxrwx 1 22406 65533 704K Aug 22 16:03 071417_075003_000152_insacct.txt
+-rwxrwxrwx 1 22406 65533 1.1M Aug 22 15:59 081017_090400_000076_insacct.txt
+-rwxrwxrwx 1 22406 65533 5.2M Aug 22 15:51 081517_000000_000042_insacct.txt
+-rwxrwxrwx 1 22406 65533 2.1M Aug 22 16:00 081617_000002_000080_insacct.txt
+-rwxrwxrwx 1 22406 65533 6.1M Aug 22 16:05 081817_095847_005006_insacct.txt
+-rwxrwxrwx 1 22406 65533 142M Aug 22 16:04 081917_000000_005005_insacct.txt
+-rwxrwxrwx 1 22406 65533 188K Aug 22 15:50 082017_110836_000039_insacct.txt
+-rwxrwxrwx 1 22406 65533  16M Aug 22 15:49 082017_140044_000019_insacct.txt
+-rwxrwxrwx 1 22406 65533 232K Aug 22 15:50 082117_000000_000036_insacct.txt
+-rwxrwxrwx 1 22406 65533 798K Aug 22 16:08 082117_000000_005076_insacct.txt
+-rwxrwxrwx 1 22406 65533 837K Aug 22 15:59 082117_080001_000073_insacct.txt
+-rwxrwxrwx 1 22406 65533  92M Aug 22 15:58 082217_000000_000052_insacct.txt
+-rwxrwxrwx 1 22406 65533 2.4M Aug 22 16:01 082217_000002_000134_insacct.txt
+-rwxrwxrwx 1 22406 65533  72K Aug 22 16:06 082217_001600_005031_insacct.txt
+-rwxrwxrwx 1 22406 65533 9.0M Aug 22 14:26 082217_043012_000326_insacct.txt
+-rwxrwxrwx 1 22406 65533  15K Aug 22 16:09 082217_070004_005093_insacct.txt
++++++++++++++++++++++++++++++++++++++++++++++++
+
+step three:
+
+run extractor from DEV:
+
++++++++++++++++++++++++++++++++++++++++++++++++
+cat ../input_data/081017_090400_000076_insacct.txt | sed -e 's/|$//g' | python ./bin/insurance0/read_76_kings_daughter_insurance0.py | python ./bin/insurance0/extractor.py 081017_090400_000076
++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+
+
+SELECT count(*)
+FROM unstaged_t;
+2466 rows
+
+etl_pipeline=# select count(*) from unstaged_t;
+ count 
+-------
+  2466
+(1 row)
+
+++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+step four:
+
+run transformer locally
+
+++++++++++++++++++++++++++++++++++++++++++++++++
+
+etl_pipeline=# select count(*) from temp_batch_insurance0_unstaged_t;
+ count 
+-------
+  2466
+(1 row)
+
+etl_pipeline=# 
+
+
+++++++++++++++++++++++++++++++++++++++++++++++++
+
+SELECT
+  cpi,
+  acctnum,
+  npi1,
+  lname,
+  fname,
+  addr2,
+  city,
+  state,
+  charges,
+  balance
+FROM temp_batch_insurance0_unstaged_t
+--WHERE cpi = 'E1503798226'
+--AND acctnum = '58000019305';
+LIMIT 20;
+
+
+etl_pipeline=# SELECT
+etl_pipeline-#   cpi,
+etl_pipeline-#   acctnum,
+etl_pipeline-#   npi1,
+etl_pipeline-#   lname,
+etl_pipeline-#   fname,
+etl_pipeline-#   addr2,
+etl_pipeline-#   city,
+etl_pipeline-#   state,
+etl_pipeline-#   charges,
+etl_pipeline-#   balance
+etl_pipeline-# FROM temp_batch_insurance0_unstaged_t
+etl_pipeline-# --WHERE cpi = 'E1503798226'
+etl_pipeline-# --AND acctnum = '58000019305';
+etl_pipeline-# LIMIT 20;
+    cpi     |   acctnum    | npi1 |  lname  |   fname   | addr2 |     city     | state | charges  | balance  
+------------+--------------+------+---------+-----------+-------+--------------+-------+----------+----------
+ M000210925 | K00030127849 |      | Kerns   | Michael   |       | Vicksburg    | MS    |  1182.09 |  1162.09
+ M000109097 | K00050007921 |      | Jackson | Robert    |       | Brookhaven   | MS    |   332.25 |   332.25
+ M000035349 | K00050007954 |      | Allen   | Troy      |       | BROOKHAVEN   | MS    |  4996.25 |  4996.25
+ M000067586 | K00050008671 |      | Hill    | Erynne    |       | BROOKHAVEN   | MS    |   739.00 |   739.00
+ M000220010 | K00050009075 |      | Cook    | Ashley    |       | BROOKHAVEN   | MS    |  4208.38 |  4208.38
+ M000114063 | K00050009117 |      | Brady   | Justus    |       | Smithdale    | MS    |   332.25 |   332.25
+ M000189098 | K00050009398 |      | Ramon   | Alejandro |       | Brookhaven   | MS    |  3509.00 |  3509.00
+ M000193779 | K00050011246 |      | Badon   | Carla     |       | Mccomb       | MS    |  2217.75 |  2217.75
+ M000072556 | K00050010008 |      | Stewart | Muriel    |       | Brookhaven   | MS    | 12806.42 | 12806.42
+ M000108591 | K00050010420 |      | Black   | John      |       | Bogue Chitto | MS    |  5156.27 |  5156.27
+ M000077438 | K00050013143 |      | Coleman | Ashley    |       | Brookhaven   | MS    |  1996.27 |  1996.27
+ M000208570 | K00050013663 |      | Cardona | Mario     |       | Hazlehurst   | MS    |  3343.50 |  3343.50
+ M000164196 | K00050013788 |      | Johnson | Edward    |       | Monticello   | MS    |   973.50 |   973.50
+ M000121533 | K00050014240 |      | Louis   | Latoi     |       | Brookhaven   | MS    |  2579.50 |  2579.50
+ M000097706 | K00050016070 |      | Mccall  | Lakeisha  |       | Brookhaven   | MS    |  1812.00 |  1812.00
+ M000220100 | K00050016732 |      | Potts   | Wondera   |       | CAMDEN       | MS    |   332.25 |   332.25
+ M000101095 | K00050017615 |      | Porter  | William   |       | Brookhaven   | MS    |  2299.39 |  2299.39
+ M000090732 | K00050012871 |      | Barlow  | Clifton   |       | Wesson       | MS    | 10822.88 | 10822.88
+ M000059249 | K00050012889 |      | German  | Ponjola   |       | Brookhaven   | MS    |  2004.69 |  2004.69
+ M000132518 | K00050020031 |      | Barnes  | Steven    |       | Bogue Chitto | MS    |  8094.30 |  8094.30
+(20 rows)
+
+etl_pipeline=#

@@ -1,0 +1,126 @@
+step one:
+
+TRUNCATE TABLE payorintel.unstaged_t;
+TRUNCATE TABLE payorintel.temp_batch_insurance0_unstaged_t;
++++++++++++++++++++++++++++++++++++++++++++++++
+
+step two:
+
+get customers incoming file samples from DAPS (chmod 754 ...)
+
+archive the sample files to 
+Z:\dev\pyconversion
+/mnt/shared/dev/pyconversion
++++++++++++++++++++++++++++++++++++++++++++++++
+-rwxrwxrwx 1 22406 65533  12K Aug 22 16:07 042617_190042_005064_insacct.txt
+-rwxrwxrwx 1 22406 65533 704K Aug 22 16:03 071417_075003_000152_insacct.txt
+-rwxrwxrwx 1 22406 65533 1.1M Aug 22 15:59 081017_090400_000076_insacct.txt
+-rwxrwxrwx 1 22406 65533 5.2M Aug 22 15:51 081517_000000_000042_insacct.txt
+-rwxrwxrwx 1 22406 65533 2.1M Aug 22 16:00 081617_000002_000080_insacct.txt
+-rwxrwxrwx 1 22406 65533 6.1M Aug 22 16:05 081817_095847_005006_insacct.txt
+-rwxrwxrwx 1 22406 65533 142M Aug 22 16:04 081917_000000_005005_insacct.txt
+-rwxrwxrwx 1 22406 65533 188K Aug 22 15:50 082017_110836_000039_insacct.txt
+-rwxrwxrwx 1 22406 65533  16M Aug 22 15:49 082017_140044_000019_insacct.txt
+-rwxrwxrwx 1 22406 65533 232K Aug 22 15:50 082117_000000_000036_insacct.txt
+-rwxrwxrwx 1 22406 65533 798K Aug 22 16:08 082117_000000_005076_insacct.txt
+-rwxrwxrwx 1 22406 65533 837K Aug 22 15:59 082117_080001_000073_insacct.txt
+-rwxrwxrwx 1 22406 65533  92M Aug 22 15:58 082217_000000_000052_insacct.txt
+-rwxrwxrwx 1 22406 65533 2.4M Aug 22 16:01 082217_000002_000134_insacct.txt
+-rwxrwxrwx 1 22406 65533  72K Aug 22 16:06 082217_001600_005031_insacct.txt
+-rwxrwxrwx 1 22406 65533 9.0M Aug 22 14:26 082217_043012_000326_insacct.txt
+-rwxrwxrwx 1 22406 65533  15K Aug 22 16:09 082217_070004_005093_insacct.txt
++++++++++++++++++++++++++++++++++++++++++++++++
+
+step three:
+
+run extractor from DEV:
+
++++++++++++++++++++++++++++++++++++++++++++++++
+cat ../input_data/081617_000002_000080_insacct.txt | python ./bin/insurance0/extractor.py 081617_000002_000080
+
+
+cat log/r_ins0_extractor.log
+
+(py2eBureau) yann.yu@mllxv-yu:etl$ cat log/r_ins0_extractor.log
+2017-09-08 14:19:03,110 - ins0_extractor - INFO - Overall: --- 0.195559978485 seconds ---
+2017-09-08 14:42:08,059 - ins0_extractor - INFO - Overall: --- 1.54430508614 seconds ---
+2017-09-08 14:43:36,548 - ins0_extractor - INFO - Overall: --- 1.35166215897 seconds ---
+2017-09-08 14:53:40,590 - ins0_extractor - INFO - Overall: --- 1.42517185211 seconds ---
+2017-09-08 15:00:39,740 - ins0_extractor - INFO - Overall: --- 8.04661989212 seconds ---
+2017-09-08 15:09:58,994 - ins0_extractor - INFO - Overall: --- 4.38706994057 seconds ---
+(py2eBureau) yann.yu@mllxv-yu:etl$ 
+
++++++++++++++++++++++++++++++++++++++++++++++++
+
+etl_pipeline=# select count(*) from unstaged_t;
+ count 
+-------
+  7040
+(1 row)
+
+
+SELECT count(*)
+FROM unstaged_t;
+7040 rows
+++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+step four:
+
+run transformer locally
+
+ python bin/insurance0/transformer.py > transformer_80.out
+
+++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+etl_pipeline=# select count(*) from temp_batch_insurance0_unstaged_t;
+ count 
+-------
+  7040
+(1 row)
+
+etl_pipeline=# 
+
+
+
+etl_pipeline=# SELECT              
+  cpi,
+  acctnum,
+  npi1,
+  lname,
+  fname,
+  addr2,
+  city,
+  state,
+  charges,
+  balance
+FROM temp_batch_insurance0_unstaged_t
+--WHERE cpi = 'E1503798226'
+--AND acctnum = '58000019305';
+LIMIT 20;
+   cpi    |  acctnum   |    npi1    |  lname   |   fname    | addr2 |     city     | state | charges  | balance  
+----------+------------+------------+----------+------------+-------+--------------+-------+----------+----------
+ 00277123 | 1000065720 | 1215967831 | Allen    | Cecelia    |       | JACKSONVILLE | AR    |  3212.00 |   899.36
+ 02114648 | 1000066036 | 1215967831 | Lockman  | Michael    |       | VILONIA      | AR    |  2592.00 |   725.76
+ 01017935 | 1000066921 | 1215967831 | Myers    | Mark       |       | Mabelvale    | AR    |  2004.00 |   561.12
+ 00701750 | 1000067033 | 1215967831 | Barnett  | Sara       |       | Paron        | AR    |  2473.00 |   492.44
+ 00688181 | 1000067397 | 1215967831 | Robinson | Sondra     |       | CONWAY       | AR    |   529.00 |   148.12
+ 00718338 | 1000068141 | 1215967831 | Humphrey | Washington |       | LITTLE ROCK  | AR    | 76747.00 | 20889.16
+ 01017935 | 1000068560 | 1215967831 | Myers    | Mark       |       | Mabelvale    | AR    |  1509.00 |   422.52
+ 00727682 | 1000069685 | 1215967831 | Grimes   | Dorothy    |       | LONOKE       | AR    |   313.02 |    87.65
+ 02175649 | 1000069979 | 1215967831 | Langley  | Jeannie    |       | Conway       | AR    |  3648.00 |   586.64
+ 00946400 | 1000070170 | 1215967831 | Watkins  | Ramona     |       | Greenbrier   | AR    |   762.00 |   213.36
+ 00326957 | 1000070506 | 1215967831 | Johnson  | Frances    |       | Bryant       | AR    |   961.00 |   269.08
+ 00107849 | 1000070568 | 1215967831 | Traylor  | Teresa     |       | Alexander    | AR    |  1649.00 |   361.72
+ 00046438 | 1000071088 | 1215967831 | Hughes   | Natalie    |       | Little Rock  | AR    |   216.00 |    60.48
+ 02176828 | 1000071100 | 1215967831 | Mostafa  | Mostafa    |       | Little Rock  | AR    |   601.00 |   168.28
+ 00107849 | 1000071242 | 1215967831 | Traylor  | Teresa     |       | Alexander    | AR    |   425.00 |   119.00
+ 00946400 | 1000071935 | 1215967831 | Watkins  | Ramona     |       | Greenbrier   | AR    |   337.00 |    94.36
+ 00968322 | 1000073846 | 1215967831 | Findley  | Carey      |       | Lonoke       | AR    | 24943.75 |  6485.37
+ 02172789 | 1000075941 | 1215967831 | Kelley   | Karen      |       | Conway       | AR    |  2923.00 |   559.98
+ 02193635 | 1000076527 | 1215967831 | Romine   | Larry      |       | STUTTGART    | AR    | 80235.80 | 20861.31
+ 02196613 | 1000077394 | 1215967831 | Layne    | Ralph      |       | GREENWOOD    | AR    | 16060.45 |  4175.72
+(20 rows)
+
+etl_pipeline=# 

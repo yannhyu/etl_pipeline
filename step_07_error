@@ -1,0 +1,10 @@
+cpan Text::CSV
+
+++++++++++++++++++++++++++++++++++++++
+
+
+
+(py2eBureau) yann.yu@mllxv-yu:etl$ cat ../input_data/081817_095847_005006_insacct.txt | sed -e '1d' | sed -e '/^100,20353,1147047/d' | ./bin/convert_csv_to_text.pl 
+Can't locate Text/CSV.pm in @INC (you may need to install the Text::CSV module) (@INC contains: /mnt/lib/perl /opt/medlytix/payorintel/lib/perl /etc/perl /usr/local/lib/x86_64-linux-gnu/perl/5.22.1 /usr/local/share/perl/5.22.1 /usr/lib/x86_64-linux-gnu/perl5/5.22 /usr/share/perl5 /usr/lib/x86_64-linux-gnu/perl/5.22 /usr/share/perl/5.22 /usr/local/lib/site_perl /usr/lib/x86_64-linux-gnu/perl-base .) at ./bin/convert_csv_to_text.pl line 9.
+BEGIN failed--compilation aborted at ./bin/convert_csv_to_text.pl line 9.
+(py2eBureau) yann.yu@mllxv-yu:etl$ 

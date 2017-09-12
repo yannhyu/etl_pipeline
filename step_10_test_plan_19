@@ -1,0 +1,145 @@
+step one:
+
+TRUNCATE TABLE payorintel.unstaged_t;
+TRUNCATE TABLE payorintel.temp_batch_insurance0_unstaged_t;
++++++++++++++++++++++++++++++++++++++++++++++++
+
+step two:
+
+get customers incoming file samples from DAPS (chmod 754 ...)
+
+archive the sample files to 
+Z:\dev\pyconversion
+/mnt/shared/dev/pyconversion
++++++++++++++++++++++++++++++++++++++++++++++++
+-rwxrwxrwx 1 22406 65533  12K Aug 22 16:07 042617_190042_005064_insacct.txt
+-rwxrwxrwx 1 22406 65533 704K Aug 22 16:03 071417_075003_000152_insacct.txt
+-rwxrwxrwx 1 22406 65533 1.1M Aug 22 15:59 081017_090400_000076_insacct.txt
+-rwxrwxrwx 1 22406 65533 5.2M Aug 22 15:51 081517_000000_000042_insacct.txt
+-rwxrwxrwx 1 22406 65533 2.1M Aug 22 16:00 081617_000002_000080_insacct.txt
+-rwxrwxrwx 1 22406 65533 6.1M Aug 22 16:05 081817_095847_005006_insacct.txt
+-rwxrwxrwx 1 22406 65533 142M Aug 22 16:04 081917_000000_005005_insacct.txt
+-rwxrwxrwx 1 22406 65533 188K Aug 22 15:50 082017_110836_000039_insacct.txt
+-rwxrwxrwx 1 22406 65533  16M Aug 22 15:49 082017_140044_000019_insacct.txt
+-rwxrwxrwx 1 22406 65533 232K Aug 22 15:50 082117_000000_000036_insacct.txt
+-rwxrwxrwx 1 22406 65533 798K Aug 22 16:08 082117_000000_005076_insacct.txt
+-rwxrwxrwx 1 22406 65533 837K Aug 22 15:59 082117_080001_000073_insacct.txt
+-rwxrwxrwx 1 22406 65533  92M Aug 22 15:58 082217_000000_000052_insacct.txt
+-rwxrwxrwx 1 22406 65533 2.4M Aug 22 16:01 082217_000002_000134_insacct.txt
+-rwxrwxrwx 1 22406 65533  72K Aug 22 16:06 082217_001600_005031_insacct.txt
+-rwxrwxrwx 1 22406 65533 9.0M Aug 22 14:26 082217_043012_000326_insacct.txt
+-rwxrwxrwx 1 22406 65533  15K Aug 22 16:09 082217_070004_005093_insacct.txt
++++++++++++++++++++++++++++++++++++++++++++++++
+
+step three:
+
+run extractor from LOCAL:
+
++++++++++++++++++++++++++++++++++++++++++++++++
+cat ../input_data/082017_140044_000019_insacct.txt | python ./bin/insurance0/extractor.py 082017_140044_000019
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+(py2eBureau) yann.yu@mllxv-yu:etl$ cat log/r_ins0_extractor.log
+
+(py2eBureau) yann.yu@mllxv-yu:etl$ cat ../input_data/082017_110836_000039_insacct.txt | python ./bin/insurance0/extractor.py 082017_110836_000039
+(py2eBureau) yann.yu@mllxv-yu:etl$ cat log/r_ins0_extractor.log
+2017-09-08 14:19:03,110 - ins0_extractor - INFO - Overall: --- 0.195559978485 seconds ---
+2017-09-08 14:42:08,059 - ins0_extractor - INFO - Overall: --- 1.54430508614 seconds ---
+2017-09-08 14:43:36,548 - ins0_extractor - INFO - Overall: --- 1.35166215897 seconds ---
+2017-09-08 14:53:40,590 - ins0_extractor - INFO - Overall: --- 1.42517185211 seconds ---
+2017-09-08 15:00:39,740 - ins0_extractor - INFO - Overall: --- 8.04661989212 seconds ---
+2017-09-08 15:09:58,994 - ins0_extractor - INFO - Overall: --- 4.38706994057 seconds ---
+2017-09-08 15:29:30,806 - ins0_extractor - INFO - Overall: --- 6.59508609772 seconds ---
+2017-09-08 15:38:55,307 - ins0_extractor - INFO - Overall: --- 0.12978386879 seconds ---
+2017-09-08 15:39:44,005 - ins0_extractor - INFO - Overall: --- 0.130273103714 seconds ---
+2017-09-08 15:59:17,737 - ins0_extractor - INFO - Overall: --- 357.989568949 seconds ---
+2017-09-08 16:58:56,962 - ins0_extractor - INFO - Overall: --- 0.518918037415 seconds ---
+2017-09-08 17:10:17,017 - ins0_extractor - INFO - Overall: --- 15.7212710381 seconds ---
+(py2eBureau) yann.yu@mllxv-yu:etl$ 
+
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+etl_pipeline=# select count(*) from unstaged_t;
+ count 
+-------
+ 27046
+(1 row)
+
+etl_pipeline=#
+
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+SELECT 
+  id_rec,
+  seqnum,
+  dataload->>'hid' as hid,
+  dataload->>'cpi' as cpi,
+  dataload->>'acctnum' as acctnum,
+  dataload->>'charges' as charges,
+  dataload->>'balance' as balance
+FROM unstaged_t
+--WHERE seqnum = 559825;
+--WHERE seqnum >= 559810;
+LIMIT 10;
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+etl_pipeline=# SELECT 
+etl_pipeline-#   id_rec,
+etl_pipeline-#   seqnum,
+etl_pipeline-#   dataload->>'hid' as hid,
+etl_pipeline-#   dataload->>'cpi' as cpi,
+etl_pipeline-#   dataload->>'acctnum' as acctnum,
+etl_pipeline-#   dataload->>'charges' as charges,
+etl_pipeline-#   dataload->>'balance' as balance
+etl_pipeline-# FROM unstaged_t
+etl_pipeline-# --WHERE seqnum = 559825;
+etl_pipeline-# --WHERE seqnum >= 559810;
+etl_pipeline-# LIMIT 10;
+ id_rec  | seqnum | hid |   cpi    |     acctnum      |  charges   |  balance   
+---------+--------+-----+----------+------------------+------------+------------
+ 2992327 |      1 |     | 40000007 | BWI04000054413   |    4151.00 |    4151.00
+ 2992328 |      2 |     | 40000001 | BWI050207671213  |     645.00 |     645.00
+ 2992329 |      3 |     | 40000005 | BWI050208456285  |    5314.00 |    5314.00
+ 2992330 |      4 |     | 40000009 | BWI050209054323  |     621.00 |     621.00
+ 2992331 |      5 |     | 130700   | BWI4000043010    |    1502.00 |    1502.00
+ 2992332 |      6 |     | 40000000 | BWI50207526760   |    1712.00 |    1712.00
+ 2992333 |      7 |     | 1061616  | BWI50207540092   |    1712.00 |    1712.00
+ 2992334 |      8 |     | 40000000 | BWI50207548913   |    1188.00 |    1188.00
+ 2992335 |      9 |     | 307662   | BWI50207558987   |     572.00 |     572.00
+ 2992336 |     10 |     | 253048   | BWI50207562864   |    1188.00 |    1188.00
+(10 rows)
+
+etl_pipeline=# 
+
+
+
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+SELECT 
+  id_rec,
+  dataload->>'cpi' as cpi,
+  dataload->>'acctnum' as acctnum,
+  dataload->>'charges' as charges,
+  dataload->>'balance' as balance
+FROM unstaged_t
+WHERE dataload->>'hid' IS NOT NULL;
+
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+step four:
+
+run transformer 
+
+python bin/insurance0/transformer.py > transformer_19.out
+
+++++++++++++++++++++++++++++++++++++++
+
+(py2eBureau) yann.yu@mllxv-yu:etl$ python bin/insurance0/transformer.py > transformer_19.out
+Exception sqlalchemy.exc.IntegrityError: IntegrityError('(psycopg2.IntegrityError) null value in column "hid" violates not-null constraint\nDETAIL:  Failing row contains (null, null, null, 19, 1, 2017-08-20 14:00:44, 1, 40000007, BWI04000054413  , 1, null, null, , null, null, null, null, null, null, null, No, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, MONTANO                       , P, OLIVIA                        , 239 WOODHILL DR APT  E        ,                               , GLEN BURNIE                   , MD, 21061,     ,          , F, 2017-05-26, null, null, MENESES                       , A, MARIA                         , 239 WOODHILL DR APT  E        ,                               , GLEN BURNIE                   , MD, 21061,     , 215496020, F, null, 3,                               , MD, 2017-05-26, 2017-05-26, Inp,         , null, null, null, null, 99468   ,         ,         , null, 4151.00, 4151.00, A       , null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 1, null, null, , null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 1081896 , 34      , MD, 2017-08-20, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null).\n',) in <generator object store2db at 0x7f24f348ecd0> ignored
+
+

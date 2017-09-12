@@ -1,0 +1,214 @@
+step one:
+
+TRUNCATE TABLE payorintel.unstaged_t;
+TRUNCATE TABLE payorintel.temp_batch_insurance0_unstaged_t;
++++++++++++++++++++++++++++++++++++++++++++++++
+
+step two:
+
+get customers incoming file samples from DAPS (chmod 754 ...)
+
+archive the sample files to 
+Z:\dev\pyconversion
+/mnt/shared/dev/pyconversion
++++++++++++++++++++++++++++++++++++++++++++++++
+-rwxrwxrwx 1 22406 65533  12K Aug 22 16:07 042617_190042_005064_insacct.txt
+-rwxrwxrwx 1 22406 65533 704K Aug 22 16:03 071417_075003_000152_insacct.txt
+-rwxrwxrwx 1 22406 65533 1.1M Aug 22 15:59 081017_090400_000076_insacct.txt
+-rwxrwxrwx 1 22406 65533 5.2M Aug 22 15:51 081517_000000_000042_insacct.txt
+-rwxrwxrwx 1 22406 65533 2.1M Aug 22 16:00 081617_000002_000080_insacct.txt
+-rwxrwxrwx 1 22406 65533 6.1M Aug 22 16:05 081817_095847_005006_insacct.txt
+-rwxrwxrwx 1 22406 65533 142M Aug 22 16:04 081917_000000_005005_insacct.txt
+-rwxrwxrwx 1 22406 65533 188K Aug 22 15:50 082017_110836_000039_insacct.txt
+-rwxrwxrwx 1 22406 65533  16M Aug 22 15:49 082017_140044_000019_insacct.txt
+-rwxrwxrwx 1 22406 65533 232K Aug 22 15:50 082117_000000_000036_insacct.txt
+-rwxrwxrwx 1 22406 65533 798K Aug 22 16:08 082117_000000_005076_insacct.txt
+-rwxrwxrwx 1 22406 65533 837K Aug 22 15:59 082117_080001_000073_insacct.txt
+-rwxrwxrwx 1 22406 65533  92M Aug 22 15:58 082217_000000_000052_insacct.txt
+-rwxrwxrwx 1 22406 65533 2.4M Aug 22 16:01 082217_000002_000134_insacct.txt
+-rwxrwxrwx 1 22406 65533  72K Aug 22 16:06 082217_001600_005031_insacct.txt
+-rwxrwxrwx 1 22406 65533 9.0M Aug 22 14:26 082217_043012_000326_insacct.txt
+-rwxrwxrwx 1 22406 65533  15K Aug 22 16:09 082217_070004_005093_insacct.txt
++++++++++++++++++++++++++++++++++++++++++++++++
+
+step three:
+
+run extractor from LOCAL:
+
++++++++++++++++++++++++++++++++++++++++++++++++
+
+        36)
+        cat ${CLIENT_IN_FILE} | sed '1d' - \
+        | sed '$d' | sed -e 's/[^-a-zA-Z0-9,#"\. ]//g' \
+        | ${MNTBIN}/convert_csv_to_text.pl | sed -e '/^[^3]/ d' \
+        | ${BIN}/insurance0/convert_insurance0_v1.pl -b ${BATCH_RECV_DATE} \
+        | ${PGSQL} ${SQL_RUNT_DIR}/load_table_batch_temp_insurance0.sql
+                ;;
+
++++++++++++++++++++++++++++++++++++++++++++++++
+cat ../input_data/082117_000000_000036_insacct.txt | sed '1d' - | sed '$d' | sed -e 's/[^-a-zA-Z0-9,#"\. ]//g' | ./bin/convert_csv_to_text.pl | sed -e '/^[^3]/ d' | python ./bin/insurance0/extractor.py 082117_000000_000036
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+(py2eBureau) yann.yu@mllxv-yu:etl$ cat ../input_data/082117_000000_000036_insacct.txt | sed '1d' - | sed '$d' | sed -e 's/[^-a-zA-Z0-9,#"\. ]//g' | ./bin/convert_csv_to_text.pl | sed -e '/^[^3]/ d' | python ./bin/insurance0/extractor.py 082117_000000_000036
+(py2eBureau) yann.yu@mllxv-yu:etl$ cat log/r_ins0_extractor.log
+2017-09-08 14:19:03,110 - ins0_extractor - INFO - Overall: --- 0.195559978485 seconds ---
+2017-09-08 14:42:08,059 - ins0_extractor - INFO - Overall: --- 1.54430508614 seconds ---
+2017-09-08 14:43:36,548 - ins0_extractor - INFO - Overall: --- 1.35166215897 seconds ---
+2017-09-08 14:53:40,590 - ins0_extractor - INFO - Overall: --- 1.42517185211 seconds ---
+2017-09-08 15:00:39,740 - ins0_extractor - INFO - Overall: --- 8.04661989212 seconds ---
+2017-09-08 15:09:58,994 - ins0_extractor - INFO - Overall: --- 4.38706994057 seconds ---
+2017-09-08 15:29:30,806 - ins0_extractor - INFO - Overall: --- 6.59508609772 seconds ---
+2017-09-08 15:38:55,307 - ins0_extractor - INFO - Overall: --- 0.12978386879 seconds ---
+2017-09-08 15:39:44,005 - ins0_extractor - INFO - Overall: --- 0.130273103714 seconds ---
+2017-09-08 15:59:17,737 - ins0_extractor - INFO - Overall: --- 357.989568949 seconds ---
+2017-09-08 16:58:56,962 - ins0_extractor - INFO - Overall: --- 0.518918037415 seconds ---
+2017-09-08 17:10:17,017 - ins0_extractor - INFO - Overall: --- 15.7212710381 seconds ---
+2017-09-08 17:17:45,371 - ins0_extractor - ERROR - Error: cust_id mismatch found...
+2017-09-08 17:18:55,912 - ins0_extractor - ERROR - Error: cust_id mismatch found...
+2017-09-08 17:19:16,495 - ins0_extractor - ERROR - Error: cust_id mismatch found...
+2017-09-08 17:19:38,229 - ins0_extractor - ERROR - Error: cust_id mismatch found...
+2017-09-08 17:21:59,562 - ins0_extractor - INFO - Overall: --- 0.423791885376 seconds ---
+(py2eBureau) yann.yu@mllxv-yu:etl$ 
+
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+etl_pipeline=# select count(*) from unstaged_t;
+ count 
+-------
+   561
+(1 row)
+
+etl_pipeline=# 
+
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+SELECT 
+  id_rec,
+  seqnum,
+  dataload->>'hid' as hid,
+  dataload->>'cpi' as cpi,
+  dataload->>'acctnum' as acctnum,
+  dataload->>'charges' as charges,
+  dataload->>'balance' as balance
+FROM unstaged_t
+--WHERE seqnum = 559825;
+--WHERE seqnum >= 559810;
+LIMIT 10;
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+etl_pipeline=# SELECT 
+etl_pipeline-#   id_rec,
+etl_pipeline-#   seqnum,
+etl_pipeline-#   dataload->>'hid' as hid,
+etl_pipeline-#   dataload->>'cpi' as cpi,
+etl_pipeline-#   dataload->>'acctnum' as acctnum,
+etl_pipeline-#   dataload->>'charges' as charges,
+etl_pipeline-#   dataload->>'balance' as balance
+etl_pipeline-# FROM unstaged_t
+etl_pipeline-# --WHERE seqnum = 559825;
+etl_pipeline-# --WHERE seqnum >= 559810;
+etl_pipeline-# LIMIT 10;
+ id_rec  | seqnum | hid |    cpi     |  acctnum   | charges | balance 
+---------+--------+-----+------------+------------+---------+---------
+ 3019373 |      1 |     | 0000242639 | 1000447392 |         | 
+ 3019374 |      2 |     | 0000102645 | 1000447396 |         | 
+ 3019375 |      3 |     | 0000062416 | 1000447397 |         | 
+ 3019376 |      4 |     | 0000052921 | 1000447402 |         | 
+ 3019377 |      5 |     | 0000161905 | 1000447401 | 627.00  | 627.00
+ 3019378 |      6 |     | 0000236373 | 1000447429 |         | 
+ 3019379 |      7 |     | 0000241489 | 1000447423 | 2100.00 | 2100.00
+ 3019380 |      8 |     | 0000207340 | 1000447436 | 906.00  | 906.00
+ 3019381 |      9 |     | 0000073602 | 1000447420 | 2148.00 | 2148.00
+ 3019382 |     10 |     | 0000051144 | 1000447444 | 319.00  | 319.00
+(10 rows)
+
+etl_pipeline=# 
+
+
+
+
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+SELECT 
+  id_rec,
+  dataload->>'cpi' as cpi,
+  dataload->>'acctnum' as acctnum,
+  dataload->>'charges' as charges,
+  dataload->>'balance' as balance
+FROM unstaged_t
+WHERE dataload->>'hid' IS NOT NULL;
+
+
+SELECT 
+COUNT(*)
+FROM unstaged_t
+WHERE dataload->>'hid' IS NOT NULL;
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+step four:
+
+run transformer 
+
+python bin/insurance0/transformer.py > transformer_36.out
+
+++++++++++++++++++++++++++++++++++++++
+
+
+etl_pipeline=# select count(*) from temp_batch_insurance0_unstaged_t;
+ count 
+-------
+   561
+(1 row)
+
+etl_pipeline=# 
+
+
++++++++++++++++++++++++++++++++++++++++++++++++
+
+etl_pipeline=# SELECT              
+etl_pipeline-#   cpi,
+etl_pipeline-#   acctnum,
+etl_pipeline-#   npi1,
+etl_pipeline-#   lname,
+etl_pipeline-#   fname,
+etl_pipeline-#   addr2,
+etl_pipeline-#   city,
+etl_pipeline-#   state,
+etl_pipeline-#   charges,
+etl_pipeline-#   balance
+etl_pipeline-# FROM temp_batch_insurance0_unstaged_t
+etl_pipeline-# --WHERE cpi = 'E1503798226'
+etl_pipeline-# --AND acctnum = '58000019305';
+etl_pipeline-# LIMIT 20;
+    cpi     |  acctnum   |    npi1    |     lname      |  fname   | addr2 |    city     | state | charges | balance 
+------------+------------+------------+----------------+----------+-------+-------------+-------+---------+---------
+ 0000242639 | 1000447392 | 1770578999 | MELO           | ROSAMOND |       | HORTENSE    | GA    |         |        
+ 0000102645 | 1000447396 | 1770578999 | CREWS          | LILLIAN  |       | JESUP       | GA    |         |        
+ 0000062416 | 1000447397 | 1770578999 | PERKINS        | MICHAEL  |       | ODUM        | GA    |         |        
+ 0000052921 | 1000447402 | 1770578999 | DANIELS        | TARSUS   |       | JESUP       | GA    |         |        
+ 0000161905 | 1000447401 | 1770578999 | KIMBREL        | DERRICK  |       | PATTERSON   | GA    |  627.00 |  627.00
+ 0000236373 | 1000447429 | 1770578999 | BEAL           | MYLES    |       | JESUP       | GA    |         |        
+ 0000241489 | 1000447423 | 1770578999 | HICKOX         | ANTHONY  |       | BLACKSHEAR  | GA    | 2100.00 | 2100.00
+ 0000207340 | 1000447436 | 1770578999 | HENDRICKS      | IMARI    |       | JESUP       | GA    |  906.00 |  906.00
+ 0000073602 | 1000447420 | 1770578999 | ARRINGTON      | BRITTANY |       | ODUM        | GA    | 2148.00 | 2148.00
+ 0000051144 | 1000447444 | 1770578999 | FRASIER        | KATHY    |       | JESUP       | GA    |  319.00 |  319.00
+ 0000082375 | 1000447406 | 1770578999 | ANDERSON       | AMY      |       | JESUP       | GA    | 2675.00 | 2675.00
+ 0000146894 | 1000447435 | 1770578999 | MESSINGER      | MATTHEW  |       | JESUP       | GA    |  319.00 |  319.00
+ 0000068241 | 1000447431 | 1770578999 | JACKSON        | NELSON   |       | JESUP       | GA    |  590.00 |  590.00
+ 0000237930 | 1000447440 | 1770578999 | SHOLAYA        | CODIE    |       | WAYNESVILLE | GA    |  319.00 |  319.00
+ 0000140843 | 1000447451 | 1770578999 | JOHNSON        | GENEVA   |       | JESUP       | GA    |         |        
+ 0000242646 | 1000447443 | 1770578999 | GONZALEZ       | ANDREW   | APT A | HINESVILLE  | GA    | 2725.00 | 2725.00
+ 0000054291 | 1000447403 | 1770578999 | FOWLER         | DOUGLAS  |       | ODUM        | GA    |  615.00 |  615.00
+ 0000242640 | 1000447400 | 1770578999 | MERRITT        | DEONTE   | F62   | JESUP       | GA    |         |        
+ 0000062895 | 1000447468 | 1770578999 | MATHIS         | JOEL     |       | HORTENSE    | GA    |  632.00 |  632.00
+ 0000222301 | 1000447460 | 1770578999 | JIMENEZ SOLANA | MARIA    |       | JESUP       | GA    | 2030.00 | 2030.00
+(20 rows)
+
+etl_pipeline=# 
+
+

@@ -1,0 +1,10 @@
+echo "# etl_pipeline" >> README.md
+git init
+git add README.md
+git commit -m "first commit"
+git remote add origin https://github.com/yannhyu/etl_pipeline.git
+git push -u origin master
+
+
+++++++++++++++++++++++++++++++++++++++++++++++++++
+

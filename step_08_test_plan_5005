@@ -1,0 +1,223 @@
+step one:
+
+TRUNCATE TABLE payorintel.unstaged_t;
+TRUNCATE TABLE payorintel.temp_batch_insurance0_unstaged_t;
++++++++++++++++++++++++++++++++++++++++++++++++
+
+step two:
+
+get customers incoming file samples from DAPS (chmod 754 ...)
+
+archive the sample files to 
+Z:\dev\pyconversion
+/mnt/shared/dev/pyconversion
++++++++++++++++++++++++++++++++++++++++++++++++
+-rwxrwxrwx 1 22406 65533  12K Aug 22 16:07 042617_190042_005064_insacct.txt
+-rwxrwxrwx 1 22406 65533 704K Aug 22 16:03 071417_075003_000152_insacct.txt
+-rwxrwxrwx 1 22406 65533 1.1M Aug 22 15:59 081017_090400_000076_insacct.txt
+-rwxrwxrwx 1 22406 65533 5.2M Aug 22 15:51 081517_000000_000042_insacct.txt
+-rwxrwxrwx 1 22406 65533 2.1M Aug 22 16:00 081617_000002_000080_insacct.txt
+-rwxrwxrwx 1 22406 65533 6.1M Aug 22 16:05 081817_095847_005006_insacct.txt
+-rwxrwxrwx 1 22406 65533 142M Aug 22 16:04 081917_000000_005005_insacct.txt
+-rwxrwxrwx 1 22406 65533 188K Aug 22 15:50 082017_110836_000039_insacct.txt
+-rwxrwxrwx 1 22406 65533  16M Aug 22 15:49 082017_140044_000019_insacct.txt
+-rwxrwxrwx 1 22406 65533 232K Aug 22 15:50 082117_000000_000036_insacct.txt
+-rwxrwxrwx 1 22406 65533 798K Aug 22 16:08 082117_000000_005076_insacct.txt
+-rwxrwxrwx 1 22406 65533 837K Aug 22 15:59 082117_080001_000073_insacct.txt
+-rwxrwxrwx 1 22406 65533  92M Aug 22 15:58 082217_000000_000052_insacct.txt
+-rwxrwxrwx 1 22406 65533 2.4M Aug 22 16:01 082217_000002_000134_insacct.txt
+-rwxrwxrwx 1 22406 65533  72K Aug 22 16:06 082217_001600_005031_insacct.txt
+-rwxrwxrwx 1 22406 65533 9.0M Aug 22 14:26 082217_043012_000326_insacct.txt
+-rwxrwxrwx 1 22406 65533  15K Aug 22 16:09 082217_070004_005093_insacct.txt
++++++++++++++++++++++++++++++++++++++++++++++++
+
+step three:
+
+run extractor from LOCAL:
+
++++++++++++++++++++++++++++++++++++++++++++++++
+cat ../input_data/081917_000000_005005_insacct.txt | ./bin/insurance0/read_5005_iasis_insurance0.pl | python ./bin/insurance0/extractor.py 081917_000000_005005
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+(py2eBureau) yann.yu@mllxv-yu:etl$ cat log/r_ins0_extractor.log
+2017-09-08 14:19:03,110 - ins0_extractor - INFO - Overall: --- 0.195559978485 seconds ---
+2017-09-08 14:42:08,059 - ins0_extractor - INFO - Overall: --- 1.54430508614 seconds ---
+2017-09-08 14:43:36,548 - ins0_extractor - INFO - Overall: --- 1.35166215897 seconds ---
+2017-09-08 14:53:40,590 - ins0_extractor - INFO - Overall: --- 1.42517185211 seconds ---
+2017-09-08 15:00:39,740 - ins0_extractor - INFO - Overall: --- 8.04661989212 seconds ---
+2017-09-08 15:09:58,994 - ins0_extractor - INFO - Overall: --- 4.38706994057 seconds ---
+2017-09-08 15:29:30,806 - ins0_extractor - INFO - Overall: --- 6.59508609772 seconds ---
+2017-09-08 15:38:55,307 - ins0_extractor - INFO - Overall: --- 0.12978386879 seconds ---
+2017-09-08 15:39:44,005 - ins0_extractor - INFO - Overall: --- 0.130273103714 seconds ---
+2017-09-08 15:59:17,737 - ins0_extractor - INFO - Overall: --- 357.989568949 seconds ---
+(py2eBureau) yann.yu@mllxv-yu:etl$ 
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+etl_pipeline=# select count(*) from unstaged_t;
+ count  
+--------
+ 559825
+(1 row)
+
+etl_pipeline=# 
+
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+SELECT 
+  id_rec,
+  seqnum,
+  dataload->>'hid' as hid,
+  dataload->>'cpi' as cpi,
+  dataload->>'acctnum' as acctnum,
+  dataload->>'charges' as charges,
+  dataload->>'balance' as balance
+FROM unstaged_t
+--WHERE seqnum = 559825;
+WHERE seqnum >= 559810;
+LIMIT 100;
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+etl_pipeline=# select
+  id_rec,
+  seqnum,
+  dataload->>'hid' as hid,
+  dataload->>'cpi' as cpi,
+  dataload->>'acctnum' as acctnum,
+  dataload->>'charges' as charges,
+  dataload->>'balance' as balance
+FROM unstaged_t
+--WHERE seqnum = 559825;
+WHERE seqnum >= 559810;
+ id_rec  | seqnum | hid |    cpi     |   acctnum   | charges  | balance 
+---------+--------+-----+------------+-------------+----------+---------
+ 2991445 | 559810 | UTB | B000847841 | B1712600010 | 2116.22  | 0.00
+ 2991446 | 559811 | UTB | B000847841 | B1712700048 | 2337.97  | 84.62
+ 2991447 | 559812 | UTC | C001011942 | C1711300062 | 1647.75  | 1135.81
+ 2991448 | 559813 | UTC | C001011942 | C1721000087 | 696.80   | 522.60
+ 2991449 | 559814 | UTB | B000654107 | B1623000298 | 902.30   | 0.00
+ 2991450 | 559815 | UTB | B000654107 | B1707400402 | 4486.90  | 0.00
+ 2991451 | 559816 | UTB | B000654107 | B1708100377 | 3613.84  | 0.00
+ 2991452 | 559817 | UTB | B000654107 | B1708200370 | 17499.68 | 0.00
+ 2991453 | 559818 | UTB | B000892445 | B1632300153 | 1460.40  | 0.00
+ 2991454 | 559819 | UTB | B000892445 | B1702300164 | 473.00   | 0.00
+ 2991455 | 559820 | UTE | E000457480 | E1627500583 | 9586.32  | 0.00
+ 2991456 | 559821 | UTE | E000457480 | E1627800067 | 7648.09  | 0.00
+ 2991457 | 559822 | UTE | E000457480 | E1712100476 | 1668.70  | 0.00
+ 2991458 | 559823 | UTE | E000457480 | E1715200304 | 1395.60  | 42.08
+ 2991459 | 559824 | UTE | E000457480 | E1717900049 | 15.80    | 0.00
+ 2991460 | 559825 | UTB | B000832089 | B1712200029 | 21500.38 | 0.00
+(16 rows)
+
+etl_pipeline=# 
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+SELECT 
+  id_rec,
+  dataload->>'cpi' as cpi,
+  dataload->>'acctnum' as acctnum,
+  dataload->>'charges' as charges,
+  dataload->>'balance' as balance
+FROM unstaged_t
+WHERE dataload->>'cpi' = 'C001011942';
+
+etl_pipeline=# SELECT 
+etl_pipeline-#   id_rec,
+etl_pipeline-#   dataload->>'cpi' as cpi,
+etl_pipeline-#   dataload->>'acctnum' as acctnum,
+etl_pipeline-#   dataload->>'charges' as charges,
+etl_pipeline-#   dataload->>'balance' as balance
+etl_pipeline-# FROM unstaged_t
+etl_pipeline-# WHERE dataload->>'cpi' = 'C001011942';
+ id_rec  |    cpi     |   acctnum   | charges | balance 
+---------+------------+-------------+---------+---------
+ 2991447 | C001011942 | C1711300062 | 1647.75 | 1135.81
+ 2991448 | C001011942 | C1721000087 | 696.80  | 522.60
+(2 rows)
+
+etl_pipeline=# 
+
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+step four:
+
+run transformer 
+
+python bin/insurance0/transformer.py > transformer_5005.out
+
+++++++++++++++++++++++++++++++++++++++
+
+etl_pipeline=# select count(*) from temp_batch_insurance0_unstaged_t;
+ count  
+--------
+ 559825
+(1 row)
+
+etl_pipeline=# 
+
+++++++++++++++++++++++++++++++++++++++++++++++
+
+SELECT              
+  cpi,
+  acctnum,
+  npi1,
+  lname,
+  fname,
+  addr2,
+  city,
+  state,
+  charges,
+  balance
+FROM temp_batch_insurance0_unstaged_t
+--WHERE cpi = 'E1503798226'
+--AND acctnum = '58000019305';
+LIMIT 20;
+
+etl_pipeline=# SELECT              
+etl_pipeline-#   cpi,
+etl_pipeline-#   acctnum,
+etl_pipeline-#   npi1,
+etl_pipeline-#   lname,
+etl_pipeline-#   fname,
+etl_pipeline-#   addr2,
+etl_pipeline-#   city,
+etl_pipeline-#   state,
+etl_pipeline-#   charges,
+etl_pipeline-#   balance
+etl_pipeline-# FROM temp_batch_insurance0_unstaged_t
+etl_pipeline-# --WHERE cpi = 'E1503798226'
+etl_pipeline-# --AND acctnum = '58000019305';
+etl_pipeline-# LIMIT 20;
+    cpi    |   acctnum   | npi1 |  lname   |   fname    |   addr2   |      city       | state | charges  | balance 
+-----------+-------------+------+----------+------------+-----------+-----------------+-------+----------+---------
+ B05695020 | B1702700086 |      | ARNEY    | MARK       |           | PHOENIX         | AZ    |  2433.85 |        
+ B05695020 | B1703800093 |      | ARNEY    | MARK       |           | PHOENIX         | AZ    |  2547.59 |        
+ J07295650 | J1632000134 |      | REIMER   | MARY       |           | MESA            | AZ    |  4651.05 |        
+ J00132223 | J1710800027 |      | MILLER   | BARBARA    |           | MESA            | AZ    |  2831.80 |        
+ B05665784 | B1635400089 |      | JAUSHLIN | COREY      | APT 213   | PHOENIX         | AZ    | 15446.04 |        
+ B05665784 | B1700400092 |      | JAUSHLIN | COREY      | APT 213   | PHOENIX         | AZ    | 11825.06 |        
+ A00852240 | A1627200012 |      | LARSEN   | AMANDA     | APT 1     | VIRGINIA        | MN    |   920.59 |        
+ B05689974 | B1627700080 |      | LARSEN   | AMANDA     | APT 1     | VIRGINIA        | MN    |  1381.82 |        
+ J07272355 | J1625700144 |      | SHARP    | ALBERT     | LOT 53    | APACHE JUNCTION | AZ    | 12015.00 |        
+ J07272355 | J1713500010 |      | SHARP    | ALBERT     | LOT 53    | APACHE JUNCTION | AZ    |  3794.70 |        
+ J00208349 | J1712500033 |      | PAYNE    | KELLY      |           | APACHE JUNCTION | AZ    |  2126.00 | 1594.50
+ J07299728 | J1633400048 |      | CHAPEL   | TONI       |           | SANTAN          | AZ    | 69940.35 |  710.95
+ J07295595 | J1625200148 |      | TAPLEY   | JOSEPH     |           | APACHE JUNCTION | AZ    | 92456.13 | 1288.00
+ J00128601 | J1716900047 |      | SMITH    | GEORGE     | LOT 53    | APACHE JUNCTION | AZ    | 63337.76 |  131.60
+ A00734329 | A1719100071 |      | WILSON   | KATHLEEN   |           | PHOENIX         | AZ    |  4125.71 |   27.47
+ J07290198 | J1717600024 |      | MONTOYA  | TANYA      |           | APACHE JUNCTION | AZ    |  3998.25 | 2998.69
+ J00167225 | J1624400043 |      | POLAND   | LORI       | LOT 235   | MESA            | AZ    |  1454.00 |        
+ B05702062 | B1719100060 |      | HORTON   | DEVONTE    |           | TEMPE           | AZ    |   900.84 |  675.63
+ J07295371 | J1624700039 |      | GILBERT  | KAREN      |           | MESA            | AZ    |  1909.00 |  201.74
+ B05451514 | B1712100156 |      | SMITH    | TYRANISHIA | UNIT 1148 | PHOENIX         | AZ    |  2628.08 |        
+(20 rows)
+
+etl_pipeline=# 
+
+
++++++++++++++++++++++++++++++++++++++++++++++
+

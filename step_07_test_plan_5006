@@ -1,0 +1,132 @@
+step one:
+
+TRUNCATE TABLE payorintel.unstaged_t;
+TRUNCATE TABLE payorintel.temp_batch_insurance0_unstaged_t;
++++++++++++++++++++++++++++++++++++++++++++++++
+
+step two:
+
+get customers incoming file samples from DAPS (chmod 754 ...)
+
+archive the sample files to 
+Z:\dev\pyconversion
+/mnt/shared/dev/pyconversion
++++++++++++++++++++++++++++++++++++++++++++++++
+-rwxrwxrwx 1 22406 65533  12K Aug 22 16:07 042617_190042_005064_insacct.txt
+-rwxrwxrwx 1 22406 65533 704K Aug 22 16:03 071417_075003_000152_insacct.txt
+-rwxrwxrwx 1 22406 65533 1.1M Aug 22 15:59 081017_090400_000076_insacct.txt
+-rwxrwxrwx 1 22406 65533 5.2M Aug 22 15:51 081517_000000_000042_insacct.txt
+-rwxrwxrwx 1 22406 65533 2.1M Aug 22 16:00 081617_000002_000080_insacct.txt
+-rwxrwxrwx 1 22406 65533 6.1M Aug 22 16:05 081817_095847_005006_insacct.txt
+-rwxrwxrwx 1 22406 65533 142M Aug 22 16:04 081917_000000_005005_insacct.txt
+-rwxrwxrwx 1 22406 65533 188K Aug 22 15:50 082017_110836_000039_insacct.txt
+-rwxrwxrwx 1 22406 65533  16M Aug 22 15:49 082017_140044_000019_insacct.txt
+-rwxrwxrwx 1 22406 65533 232K Aug 22 15:50 082117_000000_000036_insacct.txt
+-rwxrwxrwx 1 22406 65533 798K Aug 22 16:08 082117_000000_005076_insacct.txt
+-rwxrwxrwx 1 22406 65533 837K Aug 22 15:59 082117_080001_000073_insacct.txt
+-rwxrwxrwx 1 22406 65533  92M Aug 22 15:58 082217_000000_000052_insacct.txt
+-rwxrwxrwx 1 22406 65533 2.4M Aug 22 16:01 082217_000002_000134_insacct.txt
+-rwxrwxrwx 1 22406 65533  72K Aug 22 16:06 082217_001600_005031_insacct.txt
+-rwxrwxrwx 1 22406 65533 9.0M Aug 22 14:26 082217_043012_000326_insacct.txt
+-rwxrwxrwx 1 22406 65533  15K Aug 22 16:09 082217_070004_005093_insacct.txt
++++++++++++++++++++++++++++++++++++++++++++++++
+
+step three:
+
+run extractor:
+
++++++++++++++++++++++++++++++++++++++++++++++++
+cat ../input_data/081817_095847_005006_insacct.txt | sed -e '1d' | sed -e '/^100,20353,1147047/d' | ./bin/convert_csv_to_text.pl | ./bin/insurance0/read_pike_insurance0.pl | python ./bin/insurance0/extractor.py 081817_095847_005006
+
+
+(py2eBureau) yann.yu@mllxv-yu:etl$ cat ../input_data/081817_095847_005006_insacct.txt | sed -e '1d' | sed -e '/^100,20353,1147047/d' | ./bin/convert_csv_to_text.pl | ./bin/insurance0/read_pike_insurance0.pl | python ./bin/insurance0/extractor.py 081817_095847_005006
+(py2eBureau) yann.yu@mllxv-yu:etl$ cat log/r_ins0_extractor.log
+2017-09-08 14:19:03,110 - ins0_extractor - INFO - Overall: --- 0.195559978485 seconds ---
+2017-09-08 14:42:08,059 - ins0_extractor - INFO - Overall: --- 1.54430508614 seconds ---
+2017-09-08 14:43:36,548 - ins0_extractor - INFO - Overall: --- 1.35166215897 seconds ---
+2017-09-08 14:53:40,590 - ins0_extractor - INFO - Overall: --- 1.42517185211 seconds ---
+2017-09-08 15:00:39,740 - ins0_extractor - INFO - Overall: --- 8.04661989212 seconds ---
+2017-09-08 15:09:58,994 - ins0_extractor - INFO - Overall: --- 4.38706994057 seconds ---
+2017-09-08 15:29:30,806 - ins0_extractor - INFO - Overall: --- 6.59508609772 seconds ---
+(py2eBureau) yann.yu@mllxv-yu:etl$ 
+
+
+
++++++++++++++++++++++++++++++++++++++++++++++++
+
+etl_pipeline=# select count(*) from unstaged_t;
+ count 
+-------
+ 10739
+(1 row)
+
+etl_pipeline=# 
+
+
+SELECT count(*)
+FROM unstaged_t;
+10739 rows
+++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+step four:
+
+run transformer 
+
+(py2eBureau) yann.yu@mllxv-yu:etl$ python bin/insurance0/transformer.py > transformer_5006.out
+
++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+etl_pipeline=# select count(*) from temp_batch_insurance0_unstaged_t;
+ count 
+-------
+ 10739
+(1 row)
+
+etl_pipeline=# 
+
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+etl_pipeline=# SELECT              
+  cpi,
+  acctnum,
+  npi1,
+  lname,
+  fname,
+  addr2,
+  city,
+  state,
+  charges,
+  balance
+FROM temp_batch_insurance0_unstaged_t
+--WHERE cpi = 'E1503798226'
+--AND acctnum = '58000019305';
+LIMIT 20;
+  cpi  |    acctnum    | npi1 |     lname      |   fname    | addr2 |       city       | state | charges | balance 
+-------+---------------+------+----------------+------------+-------+------------------+-------+---------+---------
+ 7901  | 7901-1228407  |      | BLOMMER        | BARBARA    |       | WOODLAND PARK    | CO    | 3119.30 |        
+ 54207 | 54207-1228545 |      | BISHOP         | GYPSY      |       | GREEN MTN FALLS  | CO    |  364.95 |        
+ 33374 | 33374-1228556 |      | BARENTINE      | MICHAEL    |       | CASCADE          | CO    |   15.55 |        
+ 28350 | 28350-1228580 |      | LEWIS          | JACQUELINE |       | FLORISSANT       | CO    |   10.35 |        
+ 3224  | 3224-1227398  |      | MATCHETTE      | BILLY      |       | DIVIDE           | CO    |   11.90 |        
+ 53296 | 53296-1228405 |      | BEHRENS        | JIMMIE     |       | CRIPPLE CREEK    | CO    | 2395.45 |        
+ 22306 | 22306-1228510 |      | SAMBERSON      | PEGGY      |       | WOODLAND PARK    | CO    |  876.20 |        
+ 45722 | 45722-1228518 |      | LUCUS          | NANCY      |       | FLORISSANT       | CO    | 3215.80 |        
+ 30032 | 30032-1228522 |      | WELCH          | SUSAN      |       | WOODLAND PARK    | CO    |         |        
+ 9659  | 9659-1228527  |      | GIEGERICH      | FRANCIS    |       | WOODLAND PARK    | CO    |  674.00 |        
+ 17796 | 17796-1228530 |      | POOLE          | GARY       |       | VICTOR           | CO    | 1036.85 |        
+ 1440  | 1440-1228544  |      | FAHNESTOCK     | LILIA      |       | WOODLAND PARK    | CO    |  241.60 |        
+ 57270 | 57270-1228551 |      | VELASQUEZ      | ROSE       |       | LAKE GEORGE      | CO    |  432.85 |        
+ 13487 | 13487-1228565 |      | HERRINGTON     | GEORGIA    |       | JASPER           | TX    |  841.90 |        
+ 37243 | 37243-1228573 |      | KNOUSE         | TRINA      |       | HARTSEL          | CO    | 2864.00 |        
+ 57278 | 57278-1228604 |      | BASSINGTHWAITE | PAUL       |       | BUENA VISTA      | CO    |  154.05 |  115.54
+ 2424  | 2424-1228614  |      | OTT            | ELLEN      |       | COLORADO SPRINGS | CO    |   37.20 |        
+ 57288 | 57288-1228634 |      | JOHNSON        | JOHN       |       | CRIPPLE CREEK    | CO    | 6625.75 |        
+ 22584 | 22584-1228635 |      | PATTEE         | GRIFFIN    |       | FLORISSANT       | CO    |  529.30 |        
+ 8682  | 8682-1228692  |      | OLMSTED        | LEVINA     |       | FLORISSANT       | CO    |   41.10 |        
+(20 rows)
+
+etl_pipeline=# 
+

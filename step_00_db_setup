@@ -1,0 +1,115 @@
+sudo service postgresql restart
+
+psql -U postgres -d testdb -h 127.0.0.1 -W
+
+++++++++++++++++++++++++++++++++++++
+
+\l
+
+\connect mydatabase
+
+\dt
+
+\d tablename
+\d+ tablename
+
+++++++++++++++++++++++++++++++++++++
+
+testdb=# \d
+                     List of relations
+ Schema |            Name             |   Type   |  Owner   
+--------+-----------------------------+----------+----------
+ public | batch_insurance2_matching_t | table    | postgres
+ public | batch_insurance2_scoring_t  | table    | postgres
+ public | jsonbtable                  | table    | postgres
+ public | jsonbtable_id_seq           | sequence | postgres
+ public | reviews                     | table    | postgres
+(5 rows)
+
+++++++++++++++++++++++++++++++++++++
+
+CREATE DATABASE etl_pipeline;
+
+\connect etl_pipeline
+
+testdb=# \connect etl_pipeline
+Password for user postgres: 
+psql (9.6.2, server 9.5.8)
+SSL connection (protocol: TLSv1.2, cipher: ECDHE-RSA-AES256-GCM-SHA384, bits: 256, compression: off)
+You are now connected to database "etl_pipeline" as user "postgres".
+etl_pipeline=# 
+
+++++++++++++++++++++++++++++++++++++
+
+\i /home/yann.yu/tips/etl_pipeline/ddl/read_insurance0_v1_t.ddl
+
+psql -U postgres -d testdb -h 127.0.0.1 -f /home/yann.yu/tips/etl_pipeline/ddl/read_insurance0_v1_t.ddl -W
+
++++++++++++++++++++++++++++++++++++
+
+\i C://Users//yann.yu//Documents//tips//how2python//how2etl_pipeline//ddl//read_insurance0_v1_t.ddl
+\i C://Users//yann.yu//Documents//tips//how2python//how2etl_pipeline//ddl//read_insurance0_v2_invoice_t.ddl
+\i C://Users//yann.yu//Documents//tips//how2python//how2etl_pipeline//ddl//read_insurance0_v2_t.ddl
+\i C://Users//yann.yu//Documents//tips//how2python//how2etl_pipeline//ddl//read_insurance0_v3_invoice_t.ddl
+\i C://Users//yann.yu//Documents//tips//how2python//how2etl_pipeline//ddl//read_insurance0_v3_t.ddl
+\i C://Users//yann.yu//Documents//tips//how2python//how2etl_pipeline//ddl//read_insurance0_v4_invoice_t.ddl
+\i C://Users//yann.yu//Documents//tips//how2python//how2etl_pipeline//ddl//read_insurance0_v4_t.ddl
+\i C://Users//yann.yu//Documents//tips//how2python//how2etl_pipeline//ddl//read_insurance0_v5_t.ddl
+\i C://Users//yann.yu//Documents//tips//how2python//how2etl_pipeline//ddl//read_insurance0_v6_t.ddl
+\i C://Users//yann.yu//Documents//tips//how2python//how2etl_pipeline//ddl//insurance0_all_t_id_rec_seq.ddl
+\i C://Users//yann.yu//Documents//tips//how2python//how2etl_pipeline//ddl//temp_batch_insurance0_unstaged_t.ddl
+\i C://Users//yann.yu//Documents//tips//how2python//how2etl_pipeline//ddl//unstaged_t.ddl
+++++++++++++++++++++++++++++++++++++
+
+\i /home/yann.yu/tips/etl_pipeline/ddl/read_insurance0_v2_invoice_t.ddl
+\i /home/yann.yu/tips/etl_pipeline/ddl/read_insurance0_v2_t.ddl
+...
+
+etl_pipeline=# \i /home/yann.yu/tips/etl_pipeline/ddl/read_insurance0_v6_t.ddl
+CREATE TABLE
+etl_pipeline=# \d
+                    List of relations
+ Schema |             Name             | Type  |  Owner   
+--------+------------------------------+-------+----------
+ public | read_insurance0_v1_t         | table | postgres
+ public | read_insurance0_v2_invoice_t | table | postgres
+ public | read_insurance0_v2_t         | table | postgres
+ public | read_insurance0_v3_invoice_t | table | postgres
+ public | read_insurance0_v3_t         | table | postgres
+ public | read_insurance0_v4_invoice_t | table | postgres
+ public | read_insurance0_v4_t         | table | postgres
+ public | read_insurance0_v5_t         | table | postgres
+ public | read_insurance0_v6_t         | table | postgres
+(9 rows)
+
+etl_pipeline=# 
+
+++++++++++++++++++++++++++++++++++++
+
+etl_pipeline=# \i /home/yann.yu/tips/etl_pipeline/ddl/unstaged_t.ddl
+CREATE TABLE
+etl_pipeline=# \d
+                        List of relations
+ Schema |               Name               |   Type   |  Owner   
+--------+----------------------------------+----------+----------
+ public | insurance0_all_t_id_rec_seq      | sequence | postgres
+ public | read_insurance0_v1_t             | table    | postgres
+ public | read_insurance0_v2_invoice_t     | table    | postgres
+ public | read_insurance0_v2_t             | table    | postgres
+ public | read_insurance0_v3_invoice_t     | table    | postgres
+ public | read_insurance0_v3_t             | table    | postgres
+ public | read_insurance0_v4_invoice_t     | table    | postgres
+ public | read_insurance0_v4_t             | table    | postgres
+ public | read_insurance0_v5_t             | table    | postgres
+ public | read_insurance0_v6_t             | table    | postgres
+ public | temp_batch_insurance0_unstaged_t | table    | postgres
+ public | unstaged_t                       | table    | postgres
+(12 rows)
+
+etl_pipeline=# 
+
+
+
+
+
+

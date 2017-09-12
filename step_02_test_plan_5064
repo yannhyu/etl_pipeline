@@ -1,0 +1,142 @@
+step one:
+
+TRUNCATE TABLE payorintel.unstaged_t;
+TRUNCATE TABLE payorintel.temp_batch_insurance0_unstaged_t;
++++++++++++++++++++++++++++++++++++++++++++++++
+
+step two:
+
+get customers incoming file samples from DAPS (chmod 754 ...)
+
+archive the sample files to 
+Z:\dev\pyconversion
+/mnt/shared/dev/pyconversion
++++++++++++++++++++++++++++++++++++++++++++++++
+-rwxrwxrwx 1 22406 65533  12K Aug 22 16:07 042617_190042_005064_insacct.txt
+-rwxrwxrwx 1 22406 65533 704K Aug 22 16:03 071417_075003_000152_insacct.txt
+-rwxrwxrwx 1 22406 65533 1.1M Aug 22 15:59 081017_090400_000076_insacct.txt
+-rwxrwxrwx 1 22406 65533 5.2M Aug 22 15:51 081517_000000_000042_insacct.txt
+-rwxrwxrwx 1 22406 65533 2.1M Aug 22 16:00 081617_000002_000080_insacct.txt
+-rwxrwxrwx 1 22406 65533 6.1M Aug 22 16:05 081817_095847_005006_insacct.txt
+-rwxrwxrwx 1 22406 65533 142M Aug 22 16:04 081917_000000_005005_insacct.txt
+-rwxrwxrwx 1 22406 65533 188K Aug 22 15:50 082017_110836_000039_insacct.txt
+-rwxrwxrwx 1 22406 65533  16M Aug 22 15:49 082017_140044_000019_insacct.txt
+-rwxrwxrwx 1 22406 65533 232K Aug 22 15:50 082117_000000_000036_insacct.txt
+-rwxrwxrwx 1 22406 65533 798K Aug 22 16:08 082117_000000_005076_insacct.txt
+-rwxrwxrwx 1 22406 65533 837K Aug 22 15:59 082117_080001_000073_insacct.txt
+-rwxrwxrwx 1 22406 65533  92M Aug 22 15:58 082217_000000_000052_insacct.txt
+-rwxrwxrwx 1 22406 65533 2.4M Aug 22 16:01 082217_000002_000134_insacct.txt
+-rwxrwxrwx 1 22406 65533  72K Aug 22 16:06 082217_001600_005031_insacct.txt
+-rwxrwxrwx 1 22406 65533 9.0M Aug 22 14:26 082217_043012_000326_insacct.txt
+-rwxrwxrwx 1 22406 65533  15K Aug 22 16:09 082217_070004_005093_insacct.txt
++++++++++++++++++++++++++++++++++++++++++++++++
+
+step three:
+
+run extractor:
+
++++++++++++++++++++++++++++++++++++++++++++++++
+cat ../input_data/042617_190042_005064_insacct.txt | ./bin/insurance0/read_5064_limamemorial_insurance0.pl | ./bin/insurance0/extractor.py 042617_190042_005064
+
+
+(py2eBureau) yann.yu@mllxv-yu:etl$ cat ../input_data/042617_190042_005064_insacct.txt | ./bin/insurance0/read_5064_limamemorial_insurance0.pl | python bin/insurance0/extractor.py 042617_190042_005064
+
++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+SELECT count(*)
+FROM unstaged_t;
+
+etl_pipeline=# select count(*) from unstaged_t;
+ count 
+-------
+    46
+(1 row)
+
+++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+step four:
+
+run transformer
+
++++++++++++++++++++++++++++++++++++++++++++++++++
+
+SELECT 
+  id_rec,
+  seqnum,
+  dataload->>'hid' as hid,
+  dataload->>'cpi' as cpi,
+  dataload->>'acctnum' as acctnum,
+  dataload->>'charges' as charges,
+  dataload->>'balance' as balance
+FROM unstaged_t
+--WHERE seqnum = 559825;
+--WHERE seqnum >= 559810;
+LIMIT 10;
+
+etl_pipeline=# SELECT 
+etl_pipeline-#   id_rec,
+etl_pipeline-#   seqnum,
+etl_pipeline-#   dataload->>'hid' as hid,
+etl_pipeline-#   dataload->>'cpi' as cpi,
+etl_pipeline-#   dataload->>'acctnum' as acctnum,
+etl_pipeline-#   dataload->>'charges' as charges,
+etl_pipeline-#   dataload->>'balance' as balance
+etl_pipeline-# FROM unstaged_t
+etl_pipeline-# --WHERE seqnum = 559825;
+etl_pipeline-# --WHERE seqnum >= 559810;
+etl_pipeline-# LIMIT 10;
+ id_rec  | seqnum | hid  |   cpi   |  acctnum  | charges | balance 
+---------+--------+------+---------+-----------+---------+---------
+ 2370897 |      1 | LMHS | M451142 | V04676107 | 153.97  | 153.97
+ 2370898 |      2 | LMHS | M407982 | V04676702 | 653.60  | 653.60
+ 2370899 |      3 | LMHS | M459515 | V04700463 | 578.88  | 578.88
+ 2370900 |      4 | LMHS | M367923 | V04700570 | 546.26  | 546.26
+ 2370901 |      5 | LMHS | M456255 | V04702514 | 1133.00 | 1133.00
+ 2370902 |      6 | LMHS | M209088 | V04704868 | 578.88  | 578.88
+ 2370903 |      7 | LMHS | M119983 | V04704897 | 892.93  | 892.93
+ 2370904 |      8 | LMHS | M141364 | V04705588 | 1522.70 | 1522.70
+ 2370905 |      9 | LMHS | M116158 | V04705656 | 159.38  | 159.38
+ 2370906 |     10 | LMHS | M038020 | V04707065 | 542.62  | 542.62
+(10 rows)
+
+etl_pipeline=# 
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+SELECT 
+  id_rec,
+  dataload->>'cpi' as cpi,
+  dataload->>'acctnum' as acctnum,
+  dataload->>'charges' as charges,
+  dataload->>'balance' as balance
+FROM unstaged_t
+WHERE dataload->>'cpi' = 'M367923'
+AND dataload->>'acctnum' = 'V04700570';
+
+
+etl_pipeline=# SELECT 
+etl_pipeline-#   id_rec,
+etl_pipeline-#   dataload->>'cpi' as cpi,
+etl_pipeline-#   dataload->>'acctnum' as acctnum,
+etl_pipeline-#   dataload->>'charges' as charges,
+etl_pipeline-#   dataload->>'balance' as balance
+etl_pipeline-# FROM unstaged_t
+etl_pipeline-# WHERE dataload->>'cpi' = 'M367923'
+etl_pipeline-# AND dataload->>'acctnum' = 'V04700570';
+ id_rec  |   cpi   |  acctnum  | charges | balance 
+---------+---------+-----------+---------+---------
+ 2370900 | M367923 | V04700570 | 546.26  | 546.26
+(1 row)
+
+etl_pipeline=# 
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+UPDATE payorintel.unstaged_t 
+SET dataload=jsonb_set(dataload, '{balance}', '"(153.97)"', true) 
+WHERE dataload->>'cpi' = 'M451142'
+AND dataload->>'acctnum' = 'V04676107'; 
+--where dataload is a jsonb column type.
+

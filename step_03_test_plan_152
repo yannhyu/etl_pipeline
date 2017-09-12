@@ -1,0 +1,135 @@
+step one:
+
+TRUNCATE TABLE payorintel.unstaged_t;
+TRUNCATE TABLE payorintel.temp_batch_insurance0_unstaged_t;
++++++++++++++++++++++++++++++++++++++++++++++++
+
+step two:
+
+get customers incoming file samples from DAPS (chmod 754 ...)
+
+archive the sample files to 
+Z:\dev\pyconversion
+/mnt/shared/dev/pyconversion
++++++++++++++++++++++++++++++++++++++++++++++++
+-rwxrwxrwx 1 22406 65533  12K Aug 22 16:07 042617_190042_005064_insacct.txt
+-rwxrwxrwx 1 22406 65533 704K Aug 22 16:03 071417_075003_000152_insacct.txt
+-rwxrwxrwx 1 22406 65533 1.1M Aug 22 15:59 081017_090400_000076_insacct.txt
+-rwxrwxrwx 1 22406 65533 5.2M Aug 22 15:51 081517_000000_000042_insacct.txt
+-rwxrwxrwx 1 22406 65533 2.1M Aug 22 16:00 081617_000002_000080_insacct.txt
+-rwxrwxrwx 1 22406 65533 6.1M Aug 22 16:05 081817_095847_005006_insacct.txt
+-rwxrwxrwx 1 22406 65533 142M Aug 22 16:04 081917_000000_005005_insacct.txt
+-rwxrwxrwx 1 22406 65533 188K Aug 22 15:50 082017_110836_000039_insacct.txt
+-rwxrwxrwx 1 22406 65533  16M Aug 22 15:49 082017_140044_000019_insacct.txt
+-rwxrwxrwx 1 22406 65533 232K Aug 22 15:50 082117_000000_000036_insacct.txt
+-rwxrwxrwx 1 22406 65533 798K Aug 22 16:08 082117_000000_005076_insacct.txt
+-rwxrwxrwx 1 22406 65533 837K Aug 22 15:59 082117_080001_000073_insacct.txt
+-rwxrwxrwx 1 22406 65533  92M Aug 22 15:58 082217_000000_000052_insacct.txt
+-rwxrwxrwx 1 22406 65533 2.4M Aug 22 16:01 082217_000002_000134_insacct.txt
+-rwxrwxrwx 1 22406 65533  72K Aug 22 16:06 082217_001600_005031_insacct.txt
+-rwxrwxrwx 1 22406 65533 9.0M Aug 22 14:26 082217_043012_000326_insacct.txt
+-rwxrwxrwx 1 22406 65533  15K Aug 22 16:09 082217_070004_005093_insacct.txt
++++++++++++++++++++++++++++++++++++++++++++++++
+
+step three:
+
+run extractor from DEV:
+
++++++++++++++++++++++++++++++++++++++++++++++++
+cat ../input_data/071417_075003_000152_insacct.txt | python ./bin/insurance0/read_152_mercyhcmo_insurance0.py | python ./bin/insurance0/extractor.py 071417_075003_000152
++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+
+SELECT count(*)
+FROM payorintel.unstaged_t;
+
+
+etl_pipeline=# select count(*) from unstaged_t;
+ count 
+-------
+  2357
+(1 row)
+
+
+++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+step four:
+
+run transformer locally
+
+python bin/insurance0/transformer.py > transformer.out
+
+++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+etl_pipeline=# select count(*) from temp_batch_insurance0_unstaged_t;
+ count 
+-------
+  2357
+(1 row)
+
+etl_pipeline=# 
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+SELECT
+  cpi,
+  acctnum,
+  npi1,
+  lname,
+  fname,
+  addr2,
+  city,
+  state,
+  charges,
+  balance
+FROM temp_batch_insurance0_unstaged_t
+--WHERE cpi = 'E1503798226'
+--AND acctnum = '58000019305';
+LIMIT 20;
+
+etl_pipeline=# SELECT
+etl_pipeline-#   cpi,
+etl_pipeline-#   acctnum,
+etl_pipeline-#   npi1,
+etl_pipeline-#   lname,
+etl_pipeline-#   fname,
+etl_pipeline-#   addr2,
+etl_pipeline-#   city,
+etl_pipeline-#   state,
+etl_pipeline-#   charges,
+etl_pipeline-#   balance
+etl_pipeline-# FROM temp_batch_insurance0_unstaged_t
+etl_pipeline-# --WHERE cpi = 'E1503798226'
+etl_pipeline-# --AND acctnum = '58000019305';
+etl_pipeline-# LIMIT 20;
+     cpi     |   acctnum    | npi1 |   lname   |   fname    | addr2 |     city      | state | charges  | balance  
+-------------+--------------+------+-----------+------------+-------+---------------+-------+----------+----------
+ E1402678898 | 91000159061  |      | Curtis    | Angel      |       | NEOSHO        | MO    |   657.00 |         
+ E1302061793 | 22000300554  |      | Millikan  | William    |       | LABADIE       | MO    |   198.00 |   128.70
+ E1503798226 | 58000019305  |      | Davis     | Charles    |       | YUKON         | OK    |  2475.41 |  1609.02
+ E140127441  | 41000515057  |      | Roy       | Dorothy    |       | SEYMOUR       | MO    |   401.00 |   260.65
+ E130923798  | 21000980465  |      | Kozieja   | Ashley     |       | SAINT LOUIS   | MO    |  4135.00 |  2687.75
+ E1401435787 | 45000024617  |      | Swofford  | Terry      |       | MONETT        | MO    |  1145.00 |   744.25
+ E1402664567 | 74000245115  |      | Dreamer   | Paul       |       | POCOLA        | OK    |  2335.00 |   233.50
+ E1402992382 | 91000177494  |      | Bilke     | Crystal    |       | GALENA        | KS    |  5840.50 |  3796.32
+ E130999067  | 204000129424 |      | Corder    | Danyelle   |       | BLOOMSDALE    | MO    | 29008.47 |         
+ E1301849554 | 22000300694  |      | ROSENOW   | THOMAS     |       | VILLA RIDGE   | MO    |  2303.41 |  1497.22
+ E1301902876 | 21000986882  |      | Sansone   | Angela     |       | FENTON        | MO    |   785.57 |   510.62
+ E1401395160 | 41000520236  |      | Holmes    | Jackson    |       | SPRINGFIELD   | MO    |  1092.00 |   709.80
+ E1404186048 | 46000018191  |      | Lemley    | Velvet     |       | VAN BUREN     | MO    |  1992.50 |  1295.12
+ E1402842059 | 41000518752  |      | PATTERSON | JAKE       |       | ROGERSVILLE   | MO    |  1440.00 |   875.25
+ E1503054309 | 54000120556  |      | Cruz      | Candeladia |       | ARDMORE       | OK    |  1547.00 |  1005.55
+ E1503340397 | 507000077625 |      | Barker    | Cassandra  |       | WICHITA FALLS | TX    |   564.00 |   366.60
+ E1303192233 | 21000680245  |      | Gamanina  | Larisa     |       | SAINT LOUIS   | MO    |   180.00 |         
+ E1403212287 | 91000177538  |      | Watters   | Seth       |       | CARTHAGE      | MO    | 15235.58 | 15235.58
+ E1503630932 | 51000006489  |      | Andrade   | Martiniano |       | RINGLING      | OK    |  2988.50 |  1942.52
+ E1303174565 | 21000978610  |      | Harvey    | Tanya      |       | SAINT LOUIS   | MO    |   125.00 |     9.75
+(20 rows)
+
+etl_pipeline=# 
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
