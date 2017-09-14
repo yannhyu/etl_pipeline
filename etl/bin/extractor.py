@@ -16,6 +16,7 @@ from sqlalchemy.exc import DataError
 from sqlalchemy.dialects.postgresql import \
     CHAR, VARCHAR, DATE, TIMESTAMP, INTEGER, BIGINT, NUMERIC
 from rt_logger import make_a_logger
+from transformer import db_truncate
 # dir = os.path.dirname(__file__)
 # lib_path = os.path.join(dir, '..', '..', 'lib/python/common')
 # sys.path.append(lib_path)
@@ -101,6 +102,7 @@ def version(cust_id):
 
 if __name__ == '__main__':
     overall_start_time = time.time()
+    db_truncate('unstaged_t')
     our_run_date, param_cust_id = parse_command_line_args()
     engine = create_engine(CONN_STRING)
     metadata = MetaData(engine)

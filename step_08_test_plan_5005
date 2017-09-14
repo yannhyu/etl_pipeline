@@ -35,6 +35,10 @@ step three:
 
 run extractor from LOCAL:
 
+++++++++++++++++++++++++++++
+
+type .\input\data\081917_000000_005005_insacct_wins.txt | python bin\extractor.py 081917_000000_005005
+
 +++++++++++++++++++++++++++++++++++++++++++++++
 cat ../input_data/081917_000000_005005_insacct.txt | ./bin/insurance0/read_5005_iasis_insurance0.pl | python ./bin/insurance0/extractor.py 081917_000000_005005
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++

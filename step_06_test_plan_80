@@ -35,6 +35,10 @@ step three:
 
 run extractor from DEV:
 
++++++++++++++++++++++++++++++++++++++++++++
+
+type .\input\data\081617_000002_000080_insacct_wins.txt | python bin\extractor.py 081617_000002_000080
+
 +++++++++++++++++++++++++++++++++++++++++++++++
 cat ../input_data/081617_000002_000080_insacct.txt | python ./bin/insurance0/extractor.py 081617_000002_000080
 

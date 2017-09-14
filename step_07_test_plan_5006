@@ -35,6 +35,10 @@ step three:
 
 run extractor:
 
+++++++++++++++++++++++++++++++++++++++
+
+type .\input\data\081817_095847_005006_insacct_wins.txt | python bin\extractor.py 081817_095847_005006
+
 +++++++++++++++++++++++++++++++++++++++++++++++
 cat ../input_data/081817_095847_005006_insacct.txt | sed -e '1d' | sed -e '/^100,20353,1147047/d' | ./bin/convert_csv_to_text.pl | ./bin/insurance0/read_pike_insurance0.pl | python ./bin/insurance0/extractor.py 081817_095847_005006
 
