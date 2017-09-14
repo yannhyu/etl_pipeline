@@ -38,7 +38,7 @@ run extractor from DEV:
 
 ++++++++++++++++++++++++++++++++++++++++
 
-type .\input_data\071417_075003_000152_insacct_wins_clean.txt | python bin\extractor.py 071417_075003_000152
+type .\input\data\071417_075003_000152_insacct_wins.txt | python bin\extractor.py 071417_075003_000152
 
 +++++++++++++++++++++++++++++++++++++++++++++++
 cat ../input_data/071417_075003_000152_insacct.txt | python ./bin/insurance0/read_152_mercyhcmo_insurance0.py | python ./bin/insurance0/extractor.py 071417_075003_000152

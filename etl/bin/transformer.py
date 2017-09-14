@@ -160,22 +160,22 @@ def store2db(session):
     try:
         while True:
             dl = (yield)
-            print('{} {} {}'.format(dl.get('fname'), dl.get('mname'), dl.get('lname')))
+            # print('{} {} {}'.format(dl.get('fname'), dl.get('mname'), dl.get('lname')))
             # print(dl)
             # to fix DataError regarding date with PostgreSQL
             dl = curate(dl)
             session.add(TempBatchIns0Unstaged(**dl))
-            print('----- added one row to session ----')
+            # print('----- added one row to session ----')
 
             # except Exception as inst:
             #    session.rollback()
             #    print(inst.statement % inst.params)
         
     except GeneratorExit:
-        print('----- before commit ----')
+        # print('----- before commit ----')
         try:
             session.commit()
-            print('----- after commit ----')          
+            # print('----- after commit ----')          
         except DataError as derr:
             session.rollback()
             reason = derr.message
@@ -190,7 +190,7 @@ def store2db(session):
             print('----- Data batch inserted into DB -----')
 
     finally:
-        print('******** Finally Hit ********')                
+        print('******** la fin ********')                
 
         # truncate db source table
         # db_truncate('unstaged_t')                  
@@ -257,7 +257,7 @@ if __name__ == '__main__':
     try:
         cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
         number_of_rows = cursor.execute('select * from unstaged_t')
-        print('*** Total number of rows {}'.format(number_of_rows))
+        # print('*** Total number of rows {}'.format(number_of_rows))
         with session_scope() as session:
             for results in ResultIter(cursor):
                 transform(results,
