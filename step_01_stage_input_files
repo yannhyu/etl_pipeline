@@ -8,3 +8,7 @@ etl/lib
         | ${BIN}/insurance0/convert_insurance0_v2.pl -b ${BATCH_RECV_DATE}  \
         | ${PGSQL} ${SQL_RUNT_DIR}/load_table_batch_temp_insurance0.sql
                ;;
+
+++++++++++++++++++++++++++++++++++++++++++
+
+del /S *.pyc               

@@ -36,8 +36,12 @@ step three:
 run extractor:
 
 +++++++++++++++++++++++++++++++++++++++++++++++
+(py2eBureau) C:\Users\yann.yu\Documents\tips\how2medlytix\Input_Standardization_Python_Conversion_Part_II\creatives_09_14_2017\test_etl_pipeline\etl>
 
-type .\input_data\042617_190042_005064_insacct_wins.txt | python bin\extractor.py 042617_190042_005064
+
++++++++++++++++++++++++++++++++++++++++++++++++
+
+type .\input\data\042617_190042_005064_insacct_wins.txt | python bin\extractor.py 042617_190042_005064
 
 (py2eBureau) C:\Users\yann.yu\Documents\tips\how2python\how2etl_pipeline\etl>type .\input_data\042617_190042_005064_insacct_wins.txt | python bin\extractor.py 042617_190042_005064
 

@@ -1,0 +1,27 @@
+----- added one row to session ----
+ISAAC N TAYLOR
+----- added one row to session ----
+KELSEA N BRONSON
+----- added one row to session ----
+JANET N MANZITTO
+----- added one row to session ----
+NICOLE N CASTILLO
+----- added one row to session ----
+LEONIDAS C LO
+----- added one row to session ----
+ZACHARY N THORNTON
+----- added one row to session ----
+HAILEY N DICKSON
+----- added one row to session ----
+UNIQUE N CARDENAS
+----- added one row to session ----
+----- before commit ----
+Data Error: (psycopg2.DataError) date/time field value out of range: "/  /19"
+LINE 1: ...GULFPORT', 'MS', '39501', NULL, '425478402', 'M', '/  /19', ...
+                                                             ^
+HINT:  Perhaps you need a different "datestyle" setting.
+
+******** Finally Hit ********
+Overall: --- 6.42199993134 seconds ---
+
+(py2eBureau) C:\Users\yann.yu\Documents\tips\how2medlytix\Input_Standardization_Python_Conversion_Part_II\creatives_09_13_2017\etl_pipeline\etl>

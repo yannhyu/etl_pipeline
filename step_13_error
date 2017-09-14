@@ -1,0 +1,58 @@
+
+
+
+
+
+
+
+
+ASHLEIGH N MUNIZ
+----- added one row to session ----
+VINCENT N LOZANO
+----- added one row to session ----
+MADISON N STUDLEY
+----- added one row to session ----
+CHRISTOPHE N GARNICA
+----- added one row to session ----
+JULIO N CHAVEZ
+----- added one row to session ----
+----- before commit ----
+******** Finally Hit ********
+Exception sqlalchemy.exc.IntegrityError: IntegrityError('(psycopg2.IntegrityError) null value in column "output_id" violates not-null constraint\nDETAIL:  Failing row contains (null,
+null, null, 73, N/A, 2017-08-21 08:00:01, 1, null, 664375, 1, E18, null, , null, null, null, null, null, null, null, No, null, null, null, null, null, null, null, null, null, null, nu
+ll, null, null, null, null, null, WONG, N, EMILY, 96 S 14TH ST, null, SAN JOSE, CA, 95112, null, 564894256, N, 1971-07-06, null, null, null, N, null, null, null, null, No, null, null,
+ null, N, null, Non, UNKNOWN, CA, 2017-07-07, 2017-07-07, Non, null, 47, null, null, null, null, null, null, null, 880.00, 880.00, null, null, null, null, null, null, null, null, null
+, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, , null, null,
+ null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, nu
+ll, null, null, null, null, null, null, null, null, null, null, null, null, null).\n',) in <generator object store2db at 0x0000000006B6EEE8> ignored
+Overall: --- 10.9309999943 seconds ---
+
+(py2eBureau) C:\Users\yann.yu\Documents\tips\how2medlytix\Input_Standardization_Python_Conversion_Part_II\creatives_09_13_2017\etl_pipeline\etl>
+
+
+
+
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+VINCENT N LOZANO
+----- added one row to session ----
+MADISON N STUDLEY
+----- added one row to session ----
+CHRISTOPHE N GARNICA
+----- added one row to session ----
+JULIO N CHAVEZ
+----- added one row to session ----
+----- before commit ----
+******** Finally Hit ********
+Exception sqlalchemy.exc.IntegrityError: IntegrityError('(psycopg2.IntegrityError) null value in column "treatment_code" violates not-null constraint\nDETAIL:  Failing row contains (n
+ull, null, null, 73, null, 2017-08-21 08:00:01, 1, null, 664375, 1, E18, null, , null, null, null, null, null, null, null, No, null, null, null, null, null, null, null, null, null, nu
+ll, null, null, null, null, null, null, WONG, N, EMILY, 96 S 14TH ST, null, SAN JOSE, CA, 95112, null, 564894256, N, 1971-07-06, null, null, null, N, null, null, null, null, No, null,
+ null, null, N, null, Non, UNKNOWN, CA, 2017-07-07, 2017-07-07, Non, null, 47, null, null, null, null, null, null, null, 880.00, 880.00, null, null, null, null, null, null, null, null
+, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, , null,
+ null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, nu
+ll, null, null, null, null, null, null, null, null, null, null, null, null, null, null).\n',) in <generator object store2db at 0x0000000006AFEEE8> ignored
+Overall: --- 11.0740001202 seconds ---
+
+(py2eBureau) C:\Users\yann.yu\Documents\tips\how2medlytix\Input_Standardization_Python_Conversion_Part_II\creatives_09_13_2017\etl_pipeline\etl>

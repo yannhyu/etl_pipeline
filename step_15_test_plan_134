@@ -1,0 +1,256 @@
+step one:
+
+TRUNCATE TABLE payorintel.unstaged_t;
+TRUNCATE TABLE payorintel.temp_batch_insurance0_unstaged_t;
++++++++++++++++++++++++++++++++++++++++++++++++
+
+step two:
+
+get customers incoming file samples from DAPS (chmod 754 ...)
+
+archive the sample files to 
+Z:\dev\pyconversion
+/mnt/shared/dev/pyconversion
++++++++++++++++++++++++++++++++++++++++++++++++
+-rwxrwxrwx 1 22406 65533  12K Aug 22 16:07 042617_190042_005064_insacct.txt
+-rwxrwxrwx 1 22406 65533 704K Aug 22 16:03 071417_075003_000152_insacct.txt
+-rwxrwxrwx 1 22406 65533 1.1M Aug 22 15:59 081017_090400_000076_insacct.txt
+-rwxrwxrwx 1 22406 65533 5.2M Aug 22 15:51 081517_000000_000042_insacct.txt
+-rwxrwxrwx 1 22406 65533 2.1M Aug 22 16:00 081617_000002_000080_insacct.txt
+-rwxrwxrwx 1 22406 65533 6.1M Aug 22 16:05 081817_095847_005006_insacct.txt
+-rwxrwxrwx 1 22406 65533 142M Aug 22 16:04 081917_000000_005005_insacct.txt
+-rwxrwxrwx 1 22406 65533 188K Aug 22 15:50 082017_110836_000039_insacct.txt
+-rwxrwxrwx 1 22406 65533  16M Aug 22 15:49 082017_140044_000019_insacct.txt
+-rwxrwxrwx 1 22406 65533 232K Aug 22 15:50 082117_000000_000036_insacct.txt
+-rwxrwxrwx 1 22406 65533 798K Aug 22 16:08 082117_000000_005076_insacct.txt
+-rwxrwxrwx 1 22406 65533 837K Aug 22 15:59 082117_080001_000073_insacct.txt
+-rwxrwxrwx 1 22406 65533  92M Aug 22 15:58 082217_000000_000052_insacct.txt
+-rwxrwxrwx 1 22406 65533 2.4M Aug 22 16:01 082217_000002_000134_insacct.txt
+-rwxrwxrwx 1 22406 65533  72K Aug 22 16:06 082217_001600_005031_insacct.txt
+-rwxrwxrwx 1 22406 65533 9.0M Aug 22 14:26 082217_043012_000326_insacct.txt
+-rwxrwxrwx 1 22406 65533  15K Aug 22 16:09 082217_070004_005093_insacct.txt
++++++++++++++++++++++++++++++++++++++++++++++++
+
+step three:
+
+run extractor from LOCAL:
+++++++++++++++++++++++++++
+
+type .\input_data\082217_000002_000134_insacct_wins.txt | python bin\extractor.py 082217_000002_000134
+
++++++++++++++++++++++++++++++++++++++++
+        5076)
+        cat ${CLIENT_IN_FILE}  \
+        | ${BIN}/insurance0/read_5076_trinitas_insurance0.pl  \
+        | ${BIN}/insurance0/convert_insurance0_v5.pl -b ${BATCH_RECV_DATE}  \
+        | ${PGSQL} ${SQL_RUNT_DIR}/load_table_batch_temp_insurance0.sql
+               ;;
+
++++++++++++++++++++++++++++++++++++++++++++++++
+cat ../input_data/082117_000000_005076_insacct.txt | ./bin/insurance0/read_5076_trinitas_insurance0.pl | python ./bin/insurance0/extractor.py 082117_000000_005076
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+(py2eBureau) yann.yu@mllxv-yu:etl$ cat log/r_ins0_extractor.log
+
+(py2eBureau) yann.yu@mllxv-yu:etl$ cat ../input_data/082117_000000_005076_insacct.txt | ./bin/insurance0/read_5076_trinitas_insurance0.pl | python ./bin/insurance0/extractor.py 082117_000000_005076
+(py2eBureau) yann.yu@mllxv-yu:etl$ cat log/r_ins0_extractor.log
+2017-09-08 14:19:03,110 - ins0_extractor - INFO - Overall: --- 0.195559978485 seconds ---
+2017-09-08 14:42:08,059 - ins0_extractor - INFO - Overall: --- 1.54430508614 seconds ---
+2017-09-08 14:43:36,548 - ins0_extractor - INFO - Overall: --- 1.35166215897 seconds ---
+2017-09-08 14:53:40,590 - ins0_extractor - INFO - Overall: --- 1.42517185211 seconds ---
+2017-09-08 15:00:39,740 - ins0_extractor - INFO - Overall: --- 8.04661989212 seconds ---
+2017-09-08 15:09:58,994 - ins0_extractor - INFO - Overall: --- 4.38706994057 seconds ---
+2017-09-08 15:29:30,806 - ins0_extractor - INFO - Overall: --- 6.59508609772 seconds ---
+2017-09-08 15:38:55,307 - ins0_extractor - INFO - Overall: --- 0.12978386879 seconds ---
+2017-09-08 15:39:44,005 - ins0_extractor - INFO - Overall: --- 0.130273103714 seconds ---
+2017-09-08 15:59:17,737 - ins0_extractor - INFO - Overall: --- 357.989568949 seconds ---
+2017-09-08 16:58:56,962 - ins0_extractor - INFO - Overall: --- 0.518918037415 seconds ---
+2017-09-08 17:10:17,017 - ins0_extractor - INFO - Overall: --- 15.7212710381 seconds ---
+2017-09-08 17:17:45,371 - ins0_extractor - ERROR - Error: cust_id mismatch found...
+2017-09-08 17:18:55,912 - ins0_extractor - ERROR - Error: cust_id mismatch found...
+2017-09-08 17:19:16,495 - ins0_extractor - ERROR - Error: cust_id mismatch found...
+2017-09-08 17:19:38,229 - ins0_extractor - ERROR - Error: cust_id mismatch found...
+2017-09-08 17:21:59,562 - ins0_extractor - INFO - Overall: --- 0.423791885376 seconds ---
+2017-09-08 17:34:45,087 - ins0_extractor - INFO - Overall: --- 0.121374130249 seconds ---
+2017-09-08 17:35:19,206 - ins0_extractor - INFO - Overall: --- 1.23516201973 seconds ---
+(py2eBureau) yann.yu@mllxv-yu:etl$
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+etl_pipeline=# select count(*) from unstaged_t;                      
+ count 
+-------
+  2328
+(1 row)
+
+etl_pipeline=# 
+
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+SELECT 
+  id_rec,
+  seqnum,
+  dataload->>'hid' as hid,
+  dataload->>'cpi' as cpi,
+  dataload->>'acctnum' as acctnum,
+  dataload->>'charges' as charges,
+  dataload->>'balance' as balance
+FROM unstaged_t
+--WHERE seqnum = 559825;
+--WHERE seqnum >= 559810;
+LIMIT 10;
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+etl_pipeline=# SELECT 
+etl_pipeline-#   id_rec,
+etl_pipeline-#   seqnum,
+etl_pipeline-#   dataload->>'hid' as hid,
+etl_pipeline-#   dataload->>'cpi' as cpi,
+etl_pipeline-#   dataload->>'acctnum' as acctnum,
+etl_pipeline-#   dataload->>'charges' as charges,
+etl_pipeline-#   dataload->>'balance' as balance
+etl_pipeline-# FROM unstaged_t
+etl_pipeline-# --WHERE seqnum = 559825;
+etl_pipeline-# --WHERE seqnum >= 559810;
+etl_pipeline-# LIMIT 10;
+ id_rec  | seqnum | hid |  cpi   | acctnum  | charges  | balance  
+---------+--------+-----+--------+----------+----------+----------
+ 3019934 |      1 | 1   | 100621 | 81184211 | 1600.00  | 219.20
+ 3019935 |      2 | 1   | 102374 | 81166826 | 3356.00  | 459.77
+ 3019936 |      3 | 1   | 103264 | 81170284 | 1360.00  | 175.63
+ 3019937 |      4 | 1   | 106199 | 81179808 | 2395.00  | 2058.95
+ 3019938 |      5 | 1   | 107667 | 81176666 | 1792.00  | 1781.64
+ 3019939 |      6 | 1   | 108316 | 81174661 | 47887.00 | 13640.78
+ 3019940 |      7 | 1   | 108413 | 81155350 | 2563.60  | 400.18
+ 3019941 |      8 | 1   | 108413 | 81177792 | 2546.00  | 348.80
+ 3019942 |      9 | 1   | 108413 | 81181094 | 2514.00  | 2484.66
+ 3019943 |     10 | 1   | 108413 | 81181606 | 2563.60  | 351.21
+(10 rows)
+
+etl_pipeline=# 
+
+
+
+
+
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+SELECT 
+  id_rec,
+  dataload->>'cpi' as cpi,
+  dataload->>'acctnum' as acctnum,
+  dataload->>'charges' as charges,
+  dataload->>'balance' as balance
+FROM unstaged_t
+WHERE dataload->>'hid' IS NOT NULL;
+
+
+SELECT 
+COUNT(*)
+FROM unstaged_t
+WHERE dataload->>'hid' IS NOT NULL;
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+step four:
+
+run transformer 
+
+python bin/insurance0/transformer.py > transformer_5076.out
+
+++++++++++++++++++++++++++++++++++++++
+
+
+etl_pipeline=# select count(*) from temp_batch_insurance0_unstaged_t;
+ count 
+-------
+  2328
+(1 row)
+
+etl_pipeline=# 
+
+
+
++++++++++++++++++++++++++++++++++++++++++++++++
+
+SELECT 
+  our_run_date,
+  dob,
+  g_dob,
+  service_date_begin,
+  service_date_end,
+  medicaid_max_date,
+  medicare_max_date,
+  third_party_sent_date,
+  emdeon_sent_date,
+  client_date1,
+  dob_corrected,
+  drop_date
+FROM temp_batch_insurance0_unstaged_t
+LIMIT 20;
+
++++++++++++++++++++++++++++++++++
+
+
+SELECT              
+  cpi,
+  acctnum,
+  npi1,
+  lname,
+  fname,
+  addr2,
+  city,
+  state,
+  charges,
+  balance
+FROM temp_batch_insurance0_unstaged_t
+--WHERE cpi = 'E1503798226'
+--AND acctnum = '58000019305';
+LIMIT 20;
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+etl_pipeline=# SELECT              
+etl_pipeline-#   cpi,
+etl_pipeline-#   acctnum,
+etl_pipeline-#   npi1,
+etl_pipeline-#   lname,
+etl_pipeline-#   fname,
+etl_pipeline-#   addr2,
+etl_pipeline-#   city,
+etl_pipeline-#   state,
+etl_pipeline-#   charges,
+etl_pipeline-#   balance
+etl_pipeline-# FROM temp_batch_insurance0_unstaged_t
+etl_pipeline-# --WHERE cpi = 'E1503798226'
+etl_pipeline-# --AND acctnum = '58000019305';
+etl_pipeline-# LIMIT 20;
+  cpi   | acctnum  | npi1 |     lname     |  fname   |  addr2  |   city    | state | charges  | balance  
+--------+----------+------+---------------+----------+---------+-----------+-------+----------+----------
+ 100621 | 81184211 |      | BOWERSRAYMOND | CANDACE  | APT 519 | LINDEN    | NJ    |  1600.00 |   219.20
+ 102374 | 81166826 |      | MARTINEZ      | LUIS     |         | ELIZABETH | NJ    |  3356.00 |   459.77
+ 103264 | 81170284 |      | MURRAY        | WINNIE   |         | COLUMBIA  | SC    |  1360.00 |   175.63
+ 106199 | 81179808 |      | ROBINSON      | KEVIN    | APT 301 | ELIZABETH | NJ    |  2395.00 |  2058.95
+ 107667 | 81176666 |      | JONES         | TERRY    |         | NEWARK    | NJ    |  1792.00 |  1781.64
+ 108316 | 81174661 |      | ORTIZ         | JESUS    | APT 7A  | ELIZABETH | NJ    | 47887.00 | 13640.78
+ 108413 | 81155350 |      | DIXON         | CHARLENE |         | ELIZABETH | NJ    |  2563.60 |   400.18
+ 108413 | 81177792 |      | DIXON         | CHARLENE |         | ELIZABETH | NJ    |  2546.00 |   348.80
+ 108413 | 81181094 |      | DIXON         | CHARLENE |         | ELIZABETH | NJ    |  2514.00 |  2484.66
+ 108413 | 81181606 |      | DIXON         | CHARLENE |         | ELIZABETH | NJ    |  2563.60 |   351.21
+ 110000 | 81169030 |      | HAMM          | THOMAS   |         | ELIZABETH | NJ    |  2763.00 |  2086.74
+ 116053 | 81094456 |      | HERNANDEZ     | IRIS     |         | ELIZABETH | NJ    |  6388.00 |  1662.11
+ 116227 | 81174025 |      | HOOD          | LACY     |         | ELIZABETH | NJ    |  5672.00 |   480.19
+ 124109 | 81180398 |      | TERRY         | CAROL    | APT 1   | ELIZABETH | NJ    |  2060.00 |  1790.01
+ 124842 | 81148550 |      | TORRES        | ARBELA   | 2ND FL  | ELIZABETH | NJ    |  2018.00 |   214.68
+ 126747 | 81178996 |      | LOWRIE        | JAMES    | APT A3  | ELIZABETH | NJ    |  2563.60 |   488.12
+ 126825 | 81176007 |      | CLARKE        | VERNESSA | APT A1  | ELIZABETH | NJ    |  3210.00 |  2123.19
+ 127023 | 81160959 |      | ELLMER        | JAMES    |         | UNION     | NJ    |  2000.00 |   274.00
+ 127266 | 81177621 |      | GUTIERREZ     | FERNANDO | APT B   | RAHWAY    | NJ    |  1001.00 |   913.84
+ 127435 | 81173526 |      | LOPEZ         | ANGELA   | 201B    | ELIZABETH | NJ    |  8175.00 |   908.60
+(20 rows)
+
+etl_pipeline=# 
