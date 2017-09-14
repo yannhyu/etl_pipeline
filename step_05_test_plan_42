@@ -37,7 +37,7 @@ run extractor from DEV:
 
 +++++++++++++++++++++++++++++++++++
 
-type .\input_data\081517_000000_000042_insacct_wins_clean.txt | python bin\extractor.py 081517_000000_000042
+type .\input\data\081517_000000_000042_insacct_wins.txt | python bin\extractor.py 081517_000000_000042
 
 (py2eBureau) C:\Users\yann.yu\Documents\tips\how2python\how2etl_pipeline\etl>t
 42

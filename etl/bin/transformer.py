@@ -187,10 +187,10 @@ def store2db(session):
             # params = derr.params
             # print('Error params: {}'.format(params))                
         else:       
-            print('----- Data batch inserted into DB -----')
+            print('----- data batch inserted into DB -----')
 
     finally:
-        print('******** la fin ********')                
+        print('----- OK -----')                
 
         # truncate db source table
         # db_truncate('unstaged_t')                  
@@ -228,6 +228,9 @@ def ResultIter(cursor, arraysize=7789):
     'An iterator using fetchmany to keep memory usage down'
     while True:
         results = cursor.fetchmany(arraysize)
+        row_count = len(results)
+        if row_count:
+            print('----- row count {} in batch'.format(row_count))
         if not results:
             break
         yield results
