@@ -1,7 +1,7 @@
 step one:
 
-TRUNCATE TABLE payorintel.unstaged_t;
-TRUNCATE TABLE payorintel.temp_batch_insurance0_unstaged_t;
+TRUNCATE TABLE unstaged_t;
+TRUNCATE TABLE temp_batch_insurance0_unstaged_t;
 +++++++++++++++++++++++++++++++++++++++++++++++
 
 step two:

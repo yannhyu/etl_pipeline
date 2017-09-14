@@ -1,7 +1,7 @@
 step one:
 
-TRUNCATE TABLE payorintel.unstaged_t;
-TRUNCATE TABLE payorintel.temp_batch_insurance0_unstaged_t;
+TRUNCATE TABLE unstaged_t;
+TRUNCATE TABLE temp_batch_insurance0_unstaged_t;
 +++++++++++++++++++++++++++++++++++++++++++++++
 
 step two:
@@ -148,7 +148,7 @@ etl_pipeline=#
 
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-UPDATE payorintel.unstaged_t 
+UPDATE unstaged_t 
 SET dataload=jsonb_set(dataload, '{balance}', '"(153.97)"', true) 
 WHERE dataload->>'cpi' = 'M451142'
 AND dataload->>'acctnum' = 'V04676107'; 
